@@ -38,3 +38,25 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 
+## Project Structure (for the non-Python people)
+
+Command line scripts exists in the `scripts` folder. The files are available through the command line when the package is
+installed. An example might look like this:
+
+```
+#!/usr/bin/env python
+
+import funniest
+print funniest.joke()
+```
+
+They'll also need to be declared in the `setup.py` file like so:
+
+```
+setup(
+    ...
+    scripts=['bin/funniest-joke'],
+    ...
+)
+```
+

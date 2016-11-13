@@ -10,11 +10,13 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    # TODO: put package requirements here
+    # 'wx' # This is currently not working because newer wxpython is still under development
+    'pkg_resources'
 ]
 
 test_requirements = [
     # TODO: put package test requirements here
+    'pytest'
 ]
 
 setup(
@@ -49,5 +51,8 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     test_suite='tests',
-    tests_require=test_requirements
+    tests_require=test_requirements,
+    entry_points = {
+        'console_scripts': ['photobooth=rpi_photobooth.command_line:main']
+    }
 )
