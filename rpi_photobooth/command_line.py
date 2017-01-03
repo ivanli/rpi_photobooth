@@ -13,7 +13,7 @@ def main():
     # Setup peripherals
     webcam = controllers.Webcam()
     photo_storage = Cameras.FileSystemCameraStorage('./tmp/photobooth')
-    camera = Cameras.WebcamCamera(webcam, photo_storage)
+    camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
 
     # Start the GUI app and create basic frame
     app = wx.App()

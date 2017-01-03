@@ -14,7 +14,8 @@ requirements = [
            # It's called wxpython-pheonix for some reason.
     # 'opencv-python'
     'transitions',
-    'pillow'
+    'pillow',
+    'gphoto2'
 ]
 
 test_requirements = [

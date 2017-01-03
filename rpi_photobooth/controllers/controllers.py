@@ -27,10 +27,10 @@ class Photobooth:
         # Create state machine for photobooth
         s = [
             transitions.State(name='Init'),
-            transitions.State(name='Start', on_enter=['BindAnyButton', 'RenderStart'], on_exit=['ClearScreen']),
+            transitions.State(name='Start', on_enter=['BindAnyButton', 'ClearPhotos', 'RenderStart'], on_exit=['ClearScreen']),
             transitions.State(name='Countdown', on_enter=['StartCountdown', 'RenderCountdown'], on_exit=['StopCountdown', 'TakePhoto', 'ClearScreen']),
             transitions.State(name='ReviewPhoto', on_enter=['RenderReviewPhoto'], on_exit=['ClearScreen']),
-            transitions.State(name='PrintPhoto', on_enter=['CreatePrint', 'RenderPrintPhoto', 'PrintPhoto'], on_exit=['ClearScreen']),
+            transitions.State(name='PrintPhoto', on_enter=['CreatePrint', 'RenderPrintPhoto', 'StartPrintPhoto'], on_exit=['ClearScreen']),
             transitions.State(name='Exit', on_enter=['ExitApp'])
         ]
         t = [
@@ -41,7 +41,7 @@ class Photobooth:
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'PrintPhoto', 'conditions':['IsRightKey', 'HasEnoughPhotos'] },
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'Countdown', 'conditions':'IsRightKey' },
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'Countdown', 'conditions':'IsLeftKey', 'before':'DeleteLastPhoto' },
-            { 'trigger':'Printed', 'source':'PrintPhoto', 'dest':'StartScreen' },
+            { 'trigger':'Printed', 'source':'PrintPhoto', 'dest':'Start' },
         ]
         initial_s = 'Init'
         fsm = transitions.Machine(model=self, send_event=True, states=s, transitions=t, initial=initial_s)
@@ -85,9 +85,34 @@ class Photobooth:
         template_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'PrintTemplate.png')
         image = PIL.Image.open(template_path)
 
-        # TODO Assemble image here
+        log.debug('Template image size is {}.'.format(image.size))
+
+        # Assemble print image 
+        photos = self.photo_storage.GetPhotos()
+        photos[-3].thumbnail((560, 420))
+        photos[-2].thumbnail((560, 420))
+        photos[-1].thumbnail((560, 420))
+        image.paste(photos[-3], (20, 154))
+        image.paste(photos[-3], (620, 154))
+        image.paste(photos[-2], (20, 621))
+        image.paste(photos[-2], (620, 621))
+        image.paste(photos[-1], (20, 1087))
+        image.paste(photos[-1], (620, 1087))
 
         self.final_print = image
+
+    def StartPrintPhoto(self, event):
+        log.info('Printing photo.')
+
+        # TODO Make real detection for printer status.
+        self.frame.Bind(wx.EVT_TIMER, self.OnPrintPhotoTimerExpiry)
+        self.print_timer = wx.Timer(self.frame)
+        self.print_timer.StartOnce(5000)
+
+        log.debug('Photo printing completed.')
+
+    def ClearPhotos(self, event):
+        self.photo_storage.Clear()
 
     def RenderStart(self, event):
         self.current_view = views.StartPanel(self.frame, self.webcam)
@@ -146,7 +171,7 @@ class Photobooth:
         return self.countdown < 0
 
     def HasEnoughPhotos(self, event):
-        return len(self.photo_storage.GetPhotos()) >= 1
+        return len(self.photo_storage.GetPhotos()) >= 3
 
 
     # wxPython event bindings
@@ -158,6 +183,9 @@ class Photobooth:
 
     def OnCountdownTimerExpiry(self, event):
         self.CountExpired()
+
+    def OnPrintPhotoTimerExpiry(self, event):
+        self.Printed()
 
 
 class Webcam:
