@@ -1,36 +1,39 @@
+import logging as log
 import wx
-from . import states
+import transitions
 
-current_frame = None
-button_state = 'up'
+from .controllers import controllers
+from .controllers import Cameras
+
 def main():
-    global current_frame
-    # Do the main function here.
+    global photobooth
+    # Configure logging globally
+    log.basicConfig(format='%(levelname)s: %(message)s (%(filename)s:%(lineno)d)', level=log.DEBUG)
+
+    # Setup peripherals
+    webcam = controllers.Webcam()
+    photo_storage = Cameras.FileSystemCameraStorage('./tmp/photobooth')
+    camera = Cameras.WebcamCamera(webcam, photo_storage)
+
+    # Start the GUI app and create basic frame
     app = wx.App()
 
     frame = wx.Frame(None, style=wx.DEFAULT_FRAME_STYLE)
-    frame.ShowFullScreen(True)
+    sizer = wx.BoxSizer(wx.HORIZONTAL)
+    frame.SetSizer(sizer)
 
-    state = states.ScreenSaverState(frame)
-    state.OnEntry()
+    photobooth = controllers.Photobooth(frame, sizer, webcam, camera, photo_storage)
 
-    # Create the timers to check buttons
-    timer = wx.Timer(frame)
-    frame.Bind(wx.EVT_TIMER, CheckButton, timer)
-    
-    current_frame = frame
-    timer.Start(100)
+    app.Bind(wx.EVT_CHAR_HOOK, OnKeyDown)
+
+    log.info('Starting app')
+
+    frame.Show()
     app.MainLoop()
 
-def CheckButton(event):
-    global button_state
-    if button_state == 'down':
-        if not wx.GetKeyState(wx.WXK_HOME):
-            print('keyup')
-            wx.PostEvent(current_frame, states.AnyButtonEvent(wx.NewId()))
-            button_state = 'up' 
-    elif button_state == 'up':
-        print('checking')
-        if wx.GetKeyState(wx.WXK_HOME):
-            print('keydown')
-            button_state = 'down'
+def OnKeyDown(event):
+    global photobooth
+    log.debug('Got key down event')
+    key_code = event.GetKeyCode()
+    photobooth.KeyDown(key_code=key_code)
+
