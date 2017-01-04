@@ -4,6 +4,7 @@ import transitions
 
 from .controllers import controllers
 from .controllers import Cameras
+from .controllers import Printers
 
 def main():
     global photobooth
@@ -11,9 +12,13 @@ def main():
     log.basicConfig(format='%(levelname)s: %(message)s (%(filename)s:%(lineno)d)', level=log.DEBUG)
 
     # Setup peripherals
-    webcam = controllers.Webcam()
+    webcam = Cameras.OpencvWebcam(0, (640, 480))
+    webcam.Start()
     photo_storage = Cameras.FileSystemCameraStorage('./tmp/photobooth')
-    camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
+    #camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
+    camera = Cameras.WebcamCamera(webcam, photo_storage)
+    printer = Printers.CupsPrinter('CP910', './tmp/photobooth/printer')
+    printer.Start()
 
     # Start the GUI app and create basic frame
     app = wx.App()
@@ -22,7 +27,7 @@ def main():
     sizer = wx.BoxSizer(wx.HORIZONTAL)
     frame.SetSizer(sizer)
 
-    photobooth = controllers.Photobooth(frame, sizer, webcam, camera, photo_storage)
+    photobooth = controllers.Photobooth(frame, sizer, webcam, camera, photo_storage, printer)
 
     app.Bind(wx.EVT_CHAR_HOOK, OnKeyDown)
 

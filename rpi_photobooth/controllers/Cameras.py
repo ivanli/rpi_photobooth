@@ -6,6 +6,9 @@ import datetime
 
 import gphoto2 as gp
 
+import cv2
+import cv
+
 #
 # Base classes
 #
@@ -57,6 +60,9 @@ class CameraStorage(object):
     def Clear(self):
         self.images = []
 
+#
+# Implementations
+# 
 
 class WebcamCamera(Camera):
     """Works with using the given webcam as camera."""
@@ -87,20 +93,22 @@ class GPhotoCamera(Camera):
         super(GPhotoCamera, self).__init__(storage)
         self.context = gp.Context()
         self.camera = gp.Camera()
-        self.camera.init(self.context)
 
         if not os.path.exists(tmp_dir):
             os.makedirs(tmp_dir)
         self.tmp_dir = tmp_dir
 
-    def __del__(self):
+        # Try get into the camera to see if it's present
+        self.camera.init(self.context)
         self.camera.exit(self.context)
 
     def TakePhoto(self):
+        self.camera.init(self.context)
         path = self.camera.capture(gp.GP_CAPTURE_IMAGE, self.context)
         camera_file = self.camera.file_get(path.folder, path.name, gp.GP_FILE_TYPE_NORMAL, self.context)
         save_path = os.path.join(self.tmp_dir, path.name)
         camera_file.save(save_path)
+        self.camera.exit(self.context)
 
         image = PIL.Image.open(save_path)
         self.storage.AddPhoto(image)
@@ -139,3 +147,43 @@ class FileSystemCameraStorage(CameraStorage):
         image.save(save_path)
 
 
+class OpencvWebcam(object):
+    """
+    Driver for reading from webcam using OpenCV library
+    """
+
+    def __init__(self, camera_index, frame_size):
+        """
+        Args:
+            camera_index: (int) - Index of the camera. Use 0 for default camera.
+            frame_size: (tuple) - A tuple with (width, height) of the desired frame. Not all sizes are supported by 
+                                  all cameras so be careful what you set this to.
+        """
+
+        self.capture = cv2.VideoCapture(0)
+        self.capture.set(cv.CV_CAP_PROP_FRAME_WIDTH, frame_size[0])
+        self.capture.set(cv.CV_CAP_PROP_FRAME_HEIGHT, frame_size[1])
+        self.camera_index = camera_index
+
+    def Start(self):
+        # Do a read to initialise the webcam
+        ret, frame = self.capture.read()
+        if not ret:
+            raise WebcamException('Error occurred while reading from webcam')
+
+
+    def Read(self):
+        ret, frame = self.capture.read()
+        if not ret:
+            raise WebcamException('Error occurred while reading from webcam')
+        
+        # Do colour coversion, otherwise image will appear with funny colours.
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
+        return ret, frame
+
+class WebcamException(Exception):
+    """
+    Raise when some error has occurred with webcam operation
+    """
+    pass

@@ -9,6 +9,7 @@ import cv
 ReadyEvent, EVT_READY = wx.lib.newevent.NewEvent()
 PhotoTakenEvent, EVT_PHOTO_TAKEN = wx.lib.newevent.NewEvent()
 
+    
 class StartPanel(wx.Panel):
     fps = 15
 
@@ -287,7 +288,7 @@ def PilImageToWxImage(myPilImage, copyAlpha=True ) :
     hasAlpha = myPilImage.mode[ -1 ] == 'A'
     if copyAlpha and hasAlpha :  # Make sure there is an alpha layer copy.
 
-        myWxImage = wx.EmptyImage( *myPilImage.size )
+        myWxImage = wx.Image( *myPilImage.size )
         myPilImageCopyRGBA = myPilImage.copy()
         myPilImageCopyRGB = myPilImageCopyRGBA.convert( 'RGB' )    # RGBA --> RGB
         myPilImageRgbData =myPilImageCopyRGB.tobytes()

@@ -13,7 +13,7 @@ from ..views import views
 
 class Photobooth:
 
-    def __init__(self, frame, sizer, webcam, camera, photo_storage):
+    def __init__(self, frame, sizer, webcam, camera, photo_storage, printer):
         self.frame = frame
         self.sizer = sizer
 
@@ -23,12 +23,13 @@ class Photobooth:
 
         self.camera = camera
         self.photo_storage = photo_storage
+        self.printer = printer
 
         # Create state machine for photobooth
         s = [
             transitions.State(name='Init'),
             transitions.State(name='Start', on_enter=['BindAnyButton', 'ClearPhotos', 'RenderStart'], on_exit=['ClearScreen']),
-            transitions.State(name='Countdown', on_enter=['StartCountdown', 'RenderCountdown'], on_exit=['StopCountdown', 'TakePhoto', 'ClearScreen']),
+            transitions.State(name='Countdown', on_enter=['StartCountdown', 'RenderCountdown'], on_exit=['StopCountdown', 'ClearScreen']),
             transitions.State(name='ReviewPhoto', on_enter=['RenderReviewPhoto'], on_exit=['ClearScreen']),
             transitions.State(name='PrintPhoto', on_enter=['CreatePrint', 'RenderPrintPhoto', 'StartPrintPhoto'], on_exit=['ClearScreen']),
             transitions.State(name='Exit', on_enter=['ExitApp'])
@@ -37,7 +38,7 @@ class Photobooth:
             { 'trigger':'KeyDown', 'source':'*', 'dest':'Exit', 'conditions':'IsEscKey' },
 
             { 'trigger':'KeyDown', 'source':'Start', 'dest':'Countdown', 'conditions':'IsLeftRightKey' },
-            { 'trigger':'CountExpired', 'source':'Countdown', 'dest':'ReviewPhoto', 'conditions':'IsCountdownDone', 'prepare':'DecrementCountdown' },
+            { 'trigger':'CountExpired', 'source':'Countdown', 'dest':'ReviewPhoto', 'conditions':'IsCountdownDone', 'prepare':'DecrementCountdown', 'before':'TakePhoto' },
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'PrintPhoto', 'conditions':['IsRightKey', 'HasEnoughPhotos'] },
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'Countdown', 'conditions':'IsRightKey' },
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'Countdown', 'conditions':'IsLeftKey', 'before':'DeleteLastPhoto' },
@@ -102,14 +103,16 @@ class Photobooth:
         self.final_print = image
 
     def StartPrintPhoto(self, event):
-        log.info('Printing photo.')
+        log.info('Starting photo print.')
 
-        # TODO Make real detection for printer status.
+        self.print_id = self.printer.PrintImage(self.final_print)
+
+        # Set a timer to check whether the job was done
         self.frame.Bind(wx.EVT_TIMER, self.OnPrintPhotoTimerExpiry)
         self.print_timer = wx.Timer(self.frame)
-        self.print_timer.StartOnce(5000)
+        self.print_timer.Start(500)
 
-        log.debug('Photo printing completed.')
+        log.debug('Photo printing started.')
 
     def ClearPhotos(self, event):
         self.photo_storage.Clear()
@@ -185,24 +188,8 @@ class Photobooth:
         self.CountExpired()
 
     def OnPrintPhotoTimerExpiry(self, event):
-        self.Printed()
-
-
-class Webcam:
-
-    def __init__(self):
-        self.capture = cv2.VideoCapture(0)
-        self.capture.set(cv.CV_CAP_PROP_FRAME_WIDTH, 640)
-        self.capture.set(cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
-
-    def Start(self):
-        # Do a read to initialise the webcam
-        self.capture.read()
-
-    def Read(self):
-        ret, frame = self.capture.read()
-        if ret:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        return ret, frame
+        if self.printer.HasFinished():
+            self.print_timer.Stop()
+            self.Printed()
 
 

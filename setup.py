@@ -15,7 +15,8 @@ requirements = [
     # 'opencv-python'
     'transitions',
     'pillow',
-    'gphoto2'
+    'gphoto2',
+    'pycups'
 ]
 
 test_requirements = [
