@@ -2,6 +2,11 @@
 import cups
 import os
 import datetime
+import time
+
+#
+# Base classes
+#
 
 class PrintingService(object):
 
@@ -10,6 +15,10 @@ class PrintingService(object):
 
     def PrintImage(self, image):
         pass
+
+#
+# Printer implementations
+# 
 
 class CupsPrinter(PrintingService):
     """
@@ -42,6 +51,36 @@ class CupsPrinter(PrintingService):
     def HasFinished(self):
         return (self.last_print_id and (self.conn.getJobs().get(self.last_print_id, None) is None))
             
+class FilePrinter(PrintingService):
+    """
+    A printing service that saves the image to file instead.
+    """
+
+    def __init__(self, working_dir, delay_ms):
+        self.working_dir = working_dir
+        if not os.path.exists(working_dir):
+            os.makedirs(working_dir)
+        
+        self.print_start = None
+        self.delay = delay_ms
+
+    def PrintImage(self, image):
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
+        image_path = os.path.join(self.working_dir, 'ToPrint-{}.png'.format(timestamp))
+        image.save(image_path)
+
+        self.print_start = time.time()
+
+    def HasFinished(self):
+        end = time.time()
+        if self.print_start is not None and (end - self.print_start) * 1000 > self.delay:
+            return True
+        else:
+            return False
+
+#
+# Other classes
+# 
 
 class PrintingException(Exception):
     pass
