@@ -42,8 +42,10 @@ class viewWindow(wx.Frame):
         height, width = self.frame.shape[:2]
         image = wx.Image(width, height, self.frame)
 
+        bitmap = wx.Bitmap(width, height)
+        bitmap.CopyFromBuffer(self.frame, wx.BitmapBufferFormat_RGB)
         dc = wx.BufferedPaintDC(self)
-        dc.DrawBitmap(wx.Bitmap(image), 0, 0)
+        dc.DrawBitmap(bitmap, 0, 0)
 
 
 def main():
