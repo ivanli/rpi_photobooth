@@ -22,28 +22,8 @@ def main():
     printer.Start()
 
     # Start the GUI app and create basic frame
-    app = wx.App()
+    context = Contexts.PygameViewContext((1440, 900))
 
-    frame = wx.Frame(None, style=wx.DEFAULT_FRAME_STYLE)
-    sizer = wx.BoxSizer(wx.HORIZONTAL)
-    frame.SetSizer(sizer)
+    photobooth = controllers.Photobooth(context, webcam, camera, photo_storage, printer)
 
-    photobooth = controllers.Photobooth(frame, sizer, webcam, camera, photo_storage, printer)
-
-    app.Bind(wx.EVT_CHAR_HOOK, OnKeyDown)
-
-    log.info('Starting app')
-
-    frame.Show()
-    app.MainLoop()
-
-    self.frame = frame
-
-def OnKeyDown(event):
-    global photobooth
-    log.debug('Got key down event')
-    key_code = event.GetKeyCode()
-    photobooth.KeyDown(key_code=key_code)
-
-if __name__ == '__main__':
-    main()
+    context.Run()

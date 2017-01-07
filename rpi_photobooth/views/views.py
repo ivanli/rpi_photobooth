@@ -8,6 +8,7 @@ import cv
 
 import PIL.Image
 
+
 ReadyEvent, EVT_READY = wx.lib.newevent.NewEvent()
 PhotoTakenEvent, EVT_PHOTO_TAKEN = wx.lib.newevent.NewEvent()
 

@@ -13,14 +13,9 @@ from ..views import views
 
 class Photobooth:
 
-    def __init__(self, frame, sizer, webcam, camera, photo_storage, printer):
-        self.frame = frame
-        self.sizer = sizer
-
-        # Setup peripherals
+    def __init__(self, view_context, webcam, camera, photo_storage, printer):
+        self.context = view_context
         self.webcam = webcam
-        self.webcam.Start()
-
         self.camera = camera
         self.photo_storage = photo_storage
         self.printer = printer
