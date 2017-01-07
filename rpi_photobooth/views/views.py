@@ -238,11 +238,13 @@ class PrintPhotoPanel(wx.Panel):
         # Setup first background image.
         bgimg_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'PrintPhotoScreen.png')
         self.bg_img = wx.Image(bgimg_path, wx.BITMAP_TYPE_PNG)
+        self.scaled_bg_bitmap = None
 
         # Need to set size to ensure our parent gives us the correct space to render. Due to not using sizer.:wa
         self.SetSize(0, 0, self.bg_img.GetWidth(), self.bg_img.GetHeight())
 
-        self.photo_image = PilImageToWxImage(final_print)
+        self.photo_image = final_print
+        self.scaled_photo_image = None
 
         # Bind to wx events.
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -254,6 +256,24 @@ class PrintPhotoPanel(wx.Panel):
         self.Show()
 
     def OnSize(self, event):
+        window_h = self.GetClientSize()[1]
+        window_w = self.GetClientSize()[0]
+
+        bg_image = wx.Image(self.bg_img)
+        bg_image.Rescale(window_w, window_h, wx.IMAGE_QUALITY_HIGH)
+        self.scaled_bg_bitmap = wx.Bitmap(bg_image)
+
+        photo_w = int(467. / 1920. * window_w)
+        photo_h = int(700. / 1200. * window_h)
+        self.photo_x = int(window_w / 2 - photo_w / 2)
+        self.photo_y = int(310. / 1200. * window_h)
+
+        log.debug('Scaling to {}x{}..'.format(photo_w, photo_h))
+
+        resized_image = self.photo_image.resize((photo_w, photo_h))
+        photo_image = PilImageToWxImage(resized_image)
+        self.scaled_photo_bitmap = wx.Bitmap(photo_image)
+
         self.Refresh()
 
     def OnPaint(self, event):
@@ -261,26 +281,12 @@ class PrintPhotoPanel(wx.Panel):
         # ourselves - ie. the background is above the webcam view so it creates a border.
         log.debug('Got paint event.')
 
-        window_h = self.GetClientSize()[1]
-        window_w = self.GetClientSize()[0]
-
-        bg_image = wx.Image(self.bg_img)
-        bg_image.Rescale(window_w, window_h, wx.IMAGE_QUALITY_HIGH)
-        scaled_bg_bitmap = wx.Bitmap(bg_image)
-
-        photo_w = 467. / 1920. * window_w
-        photo_h = 700. / 1200. * window_h
-        photo_x = window_w / 2 - photo_w / 2
-        photo_y = 310. / 1200. * window_h
-
-        photo_image = wx.Image(self.photo_image)
-        photo_image.Rescale(photo_w, photo_h, wx.IMAGE_QUALITY_HIGH)
-        scaled_photo_bitmap = wx.Bitmap(photo_image)
-
         dc = wx.BufferedPaintDC(self)
         dc.Clear()
-        dc.DrawBitmap(scaled_bg_bitmap, 0, 0)
-        dc.DrawBitmap(scaled_photo_bitmap, photo_x, photo_y)
+        dc.DrawBitmap(self.scaled_bg_bitmap, 0, 0)
+        dc.DrawBitmap(self.scaled_photo_bitmap, self.photo_x, self.photo_y)
+        
+        log.debug('Paint event handled.')
 
 def PilImageToWxImage(myPilImage, copyAlpha=True ) :
     """This function was copied from https://wiki.wxpython.org/WorkingWithImages"""
@@ -297,7 +303,7 @@ def PilImageToWxImage(myPilImage, copyAlpha=True ) :
 
     else :    # The resulting image will not have alpha.
 
-        myWxImage = wx.EmptyImage( *myPilImage.size )
+        myWxImage = wx.Image( *myPilImage.size )
         myPilImageCopy = myPilImage.copy()
         myPilImageCopyRGB = myPilImageCopy.convert( 'RGB' )    # Discard any alpha from the PIL image.
         myPilImageRgbData =myPilImageCopyRGB.tobytes()

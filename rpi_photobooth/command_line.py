@@ -12,7 +12,7 @@ def main():
     log.basicConfig(format='%(levelname)s: %(message)s (%(filename)s:%(lineno)d)', level=log.DEBUG)
 
     # Setup peripherals
-    webcam = Cameras.OpencvWebcam(0, (640, 480))
+    webcam = Cameras.OpencvWebcam(0, (320, 240))
     webcam.Start()
     photo_storage = Cameras.FileSystemCameraStorage('./tmp/photobooth')
     #camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
@@ -42,3 +42,5 @@ def OnKeyDown(event):
     key_code = event.GetKeyCode()
     photobooth.KeyDown(key_code=key_code)
 
+if __name__ == '__main__':
+    main()
