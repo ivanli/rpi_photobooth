@@ -9,7 +9,7 @@ import PIL.Image
 import cv2
 import cv
 
-from ..views import views
+from ..views import PygameViews as views
 
 class Photobooth:
 
@@ -47,15 +47,13 @@ class Photobooth:
     # State / transition triggered methods
 
     def BindAnyButton(self, event):
-        self.frame.Bind(wx.EVT_CHAR_HOOK, self.OnAnyButton)
+        self.context.BindEvent(Contexts.EVT_KEY_PRESS, self.OnAnyButton)
 
     def StartCountdown(self, event):
         log.info('Starting countdown.')
-        self.countdown = 1
 
-        self.countdown_timer = wx.Timer(self.frame)
-        self.countdown_timer.Start(1000)
-        self.frame.Bind(wx.EVT_TIMER, self.OnCountdownTimerExpiry)
+        self.countdown = 1
+        self.countdown_timer = self.Context.StartPeriodicTimer(1000, OnCountdownTimerExpiry)
         
         log.debug('Countdown started with initial count {}.'.format(self.countdown))
 
@@ -68,8 +66,7 @@ class Photobooth:
         log.debug('Countdown is now {}'.format(self.countdown))
 
     def StopCountdown(self, event):
-        self.frame.Unbind(wx.EVT_TIMER)
-        self.countdown_timer.Stop()
+        self.context.StopTimer(self.countdown_timer)
 
     def TakePhoto(self, event):
         self.camera.TakePhoto()
@@ -103,9 +100,7 @@ class Photobooth:
         self.print_id = self.printer.PrintImage(self.final_print)
 
         # Set a timer to check whether the job was done
-        self.frame.Bind(wx.EVT_TIMER, self.OnPrintPhotoTimerExpiry)
-        self.print_timer = wx.Timer(self.frame)
-        self.print_timer.Start(500)
+        self.print_timer = self.context.StartPeriodicTimer(500, self.OnPrintPhotoTimerExpiry)
 
         log.debug('Photo printing started.')
 
@@ -113,30 +108,26 @@ class Photobooth:
         self.photo_storage.Clear()
 
     def RenderStart(self, event):
-        self.current_view = views.StartPanel(self.frame, self.webcam)
-        self.frame.Layout()
-        self.frame.Refresh()
+        self.current_view = views.StartPanel(self.context, self.webcam)
+        self.current_view.Show()
 
     def RenderCountdown(self, event):
-        self.current_view = views.CountdownPanel(self.frame, self.webcam, 1)
-        self.frame.Layout()
-        self.frame.Refresh()
+        self.current_view = views.CountdownPanel(self.context, self.webcam, 1)
+        self.current_view.Show()
 
     def RenderReviewPhoto(self, event):
         log.info('Rendering review photo screen.')
 
-        self.current_view = views.ReviewPhotoPanel(self.frame, self.photo_storage.GetLast())
-        self.frame.Layout()
-        self.frame.Refresh()
+        self.current_view = views.ReviewPhotoPanel(self.context, self.photo_storage.GetLast())
+        self.current_view.Show()
 
         log.debug('Render of review photo screen completed.')
 
     def RenderPrintPhoto(self, event):
         log.info('Rendering print photo screen.')
 
-        self.current_view = views.PrintPhotoPanel(self.frame, self.final_print)
-        self.frame.Layout()
-        self.frame.Refresh()
+        self.current_view = views.PrintPhotoPanel(self.context, self.final_print)
+        self.current_view.Show()
 
         log.debug('Render of print photo screen completed.')
 
