@@ -163,6 +163,8 @@ class OpencvWebcam(object):
         self.capture = cv2.VideoCapture(0)
         self.capture.set(cv.CV_CAP_PROP_FRAME_WIDTH, frame_size[0])
         self.capture.set(cv.CV_CAP_PROP_FRAME_HEIGHT, frame_size[1])
+        # Internet says this should be present but we get error when trying to execute.
+        #self.capture.set(cv.CV_CAP_PROP_BUFFERSIZE, 3)
         self.camera_index = camera_index
 
     def Start(self):
