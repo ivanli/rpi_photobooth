@@ -41,7 +41,7 @@ class PhotoboothPanel(wx.Panel):
         return wx.Bitmap(self.ToWxImage(pil_image, with_alpha))
     
 class StartPanel(PhotoboothPanel):
-    fps = 15
+    fps = 30
 
     def __init__(self, parent, webcam):
         super(StartPanel, self).__init__(parent)
@@ -50,6 +50,7 @@ class StartPanel(PhotoboothPanel):
         # segfault issues with wx's imaging operations.
         frame_image_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'StartScreen.png')
         self.frame_image = PIL.Image.open(frame_image_path)
+        self.scaled_frame_bitmap = None
 
         width, height = self.frame_image.size
         self.SetSize(0, 0, width, height)
@@ -79,7 +80,7 @@ class StartPanel(PhotoboothPanel):
     def OnSize(self, event):
         self.window_h = self.GetClientSize()[1]
         self.window_w = self.GetClientSize()[0]
-        log.debug("Got size event with {}x{}".format(self.window_w, self.window_h))
+        #log.debug("Got size event with {}x{}".format(self.window_w, self.window_h))
 
         # Webcam feed is resized on each frame received.
         self.webcam_x = int(304.0 / 1440.0 * self.window_w)
@@ -87,25 +88,26 @@ class StartPanel(PhotoboothPanel):
         self.webcam_w = int(836.0 / 1440.0 * self.window_w)
         self.webcam_h = int(627.0 / 900.0 * self.window_h)
 
-        log.debug('Webcam size is {}x{}.'.format(self.webcam_w, self.webcam_h))
+        # Resize the image here. Only done when window is resized.
+        resized_frame_image = self.frame_image.resize((self.window_w, self.window_h), PIL.Image.BILINEAR)
+        self.scaled_frame_bitmap = self.ToWxBitmap(resized_frame_image, with_alpha=True)
+
+        #log.debug('Webcam size is {}x{}.'.format(self.webcam_w, self.webcam_h))
 
     def OnPaint(self, event):
         # Here we draw all elements of the screen. Need to manually draw because we want to control the overlaying of elements
         # ourselves - ie. the background is above the webcam view so it creates a border.
-        log.debug('Got paint event.')
-
-        # Resize the image here. Only done when window is resized.
-        resized_frame_image = self.frame_image.resize((self.window_w, self.window_h), PIL.Image.BILINEAR)
-        scaled_frame_bitmap = self.ToWxBitmap(resized_frame_image, with_alpha=True)
+        #log.debug('Got paint event.')
 
         dc = wx.BufferedPaintDC(self)
         dc.Clear()
         if self.webcam_bitmap:
             dc.DrawBitmap(self.webcam_bitmap, self.webcam_x, self.webcam_y)
-        dc.DrawBitmap(scaled_frame_bitmap, 0, 0)
+        if self.scaled_frame_bitmap is not None:
+            dc.DrawBitmap(self.scaled_frame_bitmap, 0, 0)
 
     def GetNextFrame(self, event):
-        log.debug('Capturing next frame.')
+        #log.debug('Capturing next frame.')
 
         ret, frame = self.webcam.Read()
         if ret:
