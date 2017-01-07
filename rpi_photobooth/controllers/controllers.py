@@ -182,6 +182,10 @@ class Photobooth:
     def OnAnyButton(self, event):
         key_code = event.GetKeyCode()
         log.debug('Got button wx event {}.'.format(key_code))
+        
+        if key_code == wx.WXK_F12:
+            self.frame.ShowFullScreen(True)
+
         self.KeyDown(key_code=key_code)
 
     def OnCountdownTimerExpiry(self, event):

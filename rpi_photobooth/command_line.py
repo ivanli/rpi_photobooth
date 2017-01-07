@@ -17,7 +17,8 @@ def main():
     photo_storage = Cameras.FileSystemCameraStorage('./tmp/photobooth')
     #camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
     camera = Cameras.WebcamCamera(webcam, photo_storage)
-    printer = Printers.CupsPrinter('CP910', './tmp/photobooth/printer')
+    #printer = Printers.CupsPrinter('CP910', './tmp/photobooth/printer')
+    printer = Printers.FilePrinter('./tmp/photobooth/printer', 2000)
     printer.Start()
 
     # Start the GUI app and create basic frame
@@ -35,6 +36,8 @@ def main():
 
     frame.Show()
     app.MainLoop()
+
+    self.frame = frame
 
 def OnKeyDown(event):
     global photobooth

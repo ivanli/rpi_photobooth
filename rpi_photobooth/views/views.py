@@ -6,20 +6,53 @@ import wx.lib.newevent
 import cv2
 import cv
 
+import PIL.Image
+
 ReadyEvent, EVT_READY = wx.lib.newevent.NewEvent()
 PhotoTakenEvent, EVT_PHOTO_TAKEN = wx.lib.newevent.NewEvent()
 
+class PhotoboothPanel(wx.Panel):
+
+    def __init__(self, parent):
+        super(PhotoboothPanel, self).__init__(parent)
+
+    def ToWxImage(self, myPilImage, copyAlpha=False):
+        hasAlpha = myPilImage.mode[ -1 ] == 'A'
+        if copyAlpha and hasAlpha :  # Make sure there is an alpha layer copy.
     
-class StartPanel(wx.Panel):
+            myWxImage = wx.Image( *myPilImage.size )
+            myPilImageCopyRGBA = myPilImage.copy()
+            myPilImageCopyRGB = myPilImageCopyRGBA.convert( 'RGB' )    # RGBA --> RGB
+            myPilImageRgbData =myPilImageCopyRGB.tobytes()
+            myWxImage.SetData( myPilImageRgbData )
+            myWxImage.SetAlphaBuffer( myPilImageCopyRGBA.tobytes()[3::4] )  # Create layer and insert alpha values.
+    
+        else :    # The resulting image will not have alpha.
+    
+            myWxImage = wx.Image( *myPilImage.size )
+            myPilImageCopy = myPilImage.copy()
+            myPilImageCopyRGB = myPilImageCopy.convert( 'RGB' )    # Discard any alpha from the PIL image.
+            myPilImageRgbData =myPilImageCopyRGB.tobytes()
+            myWxImage.SetData( myPilImageRgbData )
+    
+        return myWxImage
+
+    def ToWxBitmap(self, pil_image, with_alpha=False):
+        return wx.Bitmap(self.ToWxImage(pil_image, with_alpha))
+    
+class StartPanel(PhotoboothPanel):
     fps = 15
 
     def __init__(self, parent, webcam):
         super(StartPanel, self).__init__(parent)
 
-        # Setup background image
-        bgimg_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'StartScreenBackground.png')
-        self.bg_img = wx.Image(bgimg_path, wx.BITMAP_TYPE_PNG)
-        self.SetSize(0, 0, self.bg_img.GetWidth(), self.bg_img.GetHeight())
+        # Setup background image. Load it as a PIL image as the library seems to be more stable in the Pi. Had
+        # segfault issues with wx's imaging operations.
+        frame_image_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'StartScreen.png')
+        self.frame_image = PIL.Image.open(frame_image_path)
+
+        width, height = self.frame_image.size
+        self.SetSize(0, 0, width, height)
 
         self.webcam = webcam
         self.webcam_bitmap = None
@@ -48,38 +81,37 @@ class StartPanel(wx.Panel):
         self.window_w = self.GetClientSize()[0]
         log.debug("Got size event with {}x{}".format(self.window_w, self.window_h))
 
-        # Resize the image here. Only done when window is resized.
-        background_image_copy = wx.Image(self.bg_img)
-        background_image_copy.Rescale(self.window_w, self.window_h, wx.IMAGE_QUALITY_HIGH)
-        self.scaled_bg_img = wx.Bitmap(background_image_copy)
-
         # Webcam feed is resized on each frame received.
-        self.webcam_x = 380.0 / 1920.0 * self.window_w
-        self.webcam_y = 220.0 / 1201.0 * self.window_h
-        self.webcam_w = 1165.0 / 1920.0 * self.window_w
-        self.webcam_h = 765.0 / 1201.0 * self.window_h
+        self.webcam_x = int(304.0 / 1440.0 * self.window_w)
+        self.webcam_y = int(132.0 / 900.0 * self.window_h)
+        self.webcam_w = int(836.0 / 1440.0 * self.window_w)
+        self.webcam_h = int(627.0 / 900.0 * self.window_h)
+
+        log.debug('Webcam size is {}x{}.'.format(self.webcam_w, self.webcam_h))
 
     def OnPaint(self, event):
         # Here we draw all elements of the screen. Need to manually draw because we want to control the overlaying of elements
         # ourselves - ie. the background is above the webcam view so it creates a border.
         log.debug('Got paint event.')
 
+        # Resize the image here. Only done when window is resized.
+        resized_frame_image = self.frame_image.resize((self.window_w, self.window_h), PIL.Image.BILINEAR)
+        scaled_frame_bitmap = self.ToWxBitmap(resized_frame_image, with_alpha=True)
+
         dc = wx.BufferedPaintDC(self)
+        dc.Clear()
         if self.webcam_bitmap:
             dc.DrawBitmap(self.webcam_bitmap, self.webcam_x, self.webcam_y)
-        dc.DrawBitmap(self.scaled_bg_img, 0, 0, useMask=True)
+        dc.DrawBitmap(scaled_frame_bitmap, 0, 0)
 
     def GetNextFrame(self, event):
         log.debug('Capturing next frame.')
 
         ret, frame = self.webcam.Read()
         if ret:
-            height, width = frame.shape[:2]
-            log.debug('Got webcam frame. Size: {}x{}'.format(width, height))
-
-            img = wx.Image(width, height, frame)
-            img.Rescale(self.webcam_w, self.webcam_h, wx.IMAGE_QUALITY_HIGH)
-            self.webcam_bitmap = wx.Bitmap(img)
+            img = PIL.Image.fromarray(frame)
+            img = img.resize((self.webcam_w, self.webcam_h), PIL.Image.NEAREST)
+            self.webcam_bitmap = self.ToWxBitmap(img)
 
             # Force a re-paint with new frame retrieved.
             self.Refresh()
