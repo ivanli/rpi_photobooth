@@ -5,6 +5,7 @@ import transitions
 from .controllers import controllers
 from .controllers import Cameras
 from .controllers import Printers
+from .views import Contexts
 
 def main():
     global photobooth
@@ -12,7 +13,8 @@ def main():
     log.basicConfig(format='%(levelname)s: %(message)s (%(filename)s:%(lineno)d)', level=log.DEBUG)
 
     # Setup peripherals
-    webcam = Cameras.OpencvWebcam(0, (320, 240))
+    #webcam = Cameras.OpencvWebcam(0, (320, 240))
+    webcam = Cameras.PygameWebcam(0, (320, 240))
     webcam.Start()
     photo_storage = Cameras.FileSystemCameraStorage('./tmp/photobooth')
     #camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')

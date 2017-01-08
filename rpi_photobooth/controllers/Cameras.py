@@ -184,6 +184,20 @@ class OpencvWebcam(object):
         
         return ret, frame
 
+import pygame
+import pygame.camera
+
+class PygameWebcam(object):
+
+    def __init__(self, camera_index, frame_size):
+       pygame.camera.init()
+       self.camera_index = camera_index
+       self.frame_size = frame_size
+       
+    def Start(self):
+        self.camera = pygame.camera.Camera('/dev/video{}'.format(self.camera_index), self.frame_size)
+        self.camera.start()
+
 class WebcamException(Exception):
     """
     Raise when some error has occurred with webcam operation

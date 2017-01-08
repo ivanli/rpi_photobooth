@@ -10,6 +10,7 @@ import cv2
 import cv
 
 from ..views import PygameViews as views
+from ..views import Contexts
 
 class Photobooth:
 
@@ -132,7 +133,6 @@ class Photobooth:
         log.debug('Render of print photo screen completed.')
 
     def ClearScreen(self, event):
-        self.frame.GetSizer().Clear()
         self.current_view.Destroy()
         
     def ExitApp(self, event):
@@ -167,9 +167,9 @@ class Photobooth:
 
     def OnAnyButton(self, event):
         key_code = event.GetKeyCode()
-        log.debug('Got button wx event {}.'.format(key_code))
+        log.debug('Got button event {}.'.format(key_code))
         
-        if key_code == wx.WXK_F12:
+        if key_code == self.context.KEY_F12:
             self.frame.ShowFullScreen(True)
 
         self.KeyDown(key_code=key_code)
