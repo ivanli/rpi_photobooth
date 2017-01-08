@@ -9,6 +9,9 @@ import gphoto2 as gp
 import cv2
 import cv
 
+import pygame
+import pygame.camera
+
 #
 # Base classes
 #
@@ -183,9 +186,6 @@ class OpencvWebcam(object):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
         return ret, frame
-
-import pygame
-import pygame.camera
 
 class PygameWebcam(object):
 

@@ -29,6 +29,7 @@ class PygameViewContext(object):
     def __init__(self, start_resolution):
         self.resolution = start_resolution
         self.event_bindings = {}
+        self.timers = {} 
 
         KEY_ESCAPE = pygame.K_ESCAPE
         KEY_LEFT = pygame.K_LEFT
@@ -56,7 +57,15 @@ class PygameViewContext(object):
             value = [x for x in a if x != callback]
 
     def StartPeriodicTimer(self, period, callback):
-        pass
+        free_id = 0
+        for i in range(pygame.USEREVENT, pygame.NUMEVENTS):
+            if not i in self.timers.keys():
+                free_id = i
+                break
+        if free_id is 0:
+            raise ViewException('Failed to find free timer id')
+
+        self.timers[free_id] = callback
 
     def Refresh(self):
         pass
