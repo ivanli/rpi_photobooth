@@ -18,17 +18,15 @@ class StartPanel(object):
         self.webcam = webcam
         self.webcam_surface = None
 
-        self.context.BindEvent(Contexts.EVT_REFRESH, self.OnPaint)
-        self.context.BindEvent(Contexts.EVT_SIZE, self.OnSize)
+        self.context.BindEvent(self.context.EVT_REFRESH, self.OnPaint)
+        #self.context.BindEvent(Contexts.EVT_SIZE, self.OnSize)
 
         # Start a refresh timer so we know when to get the next frame from the webcam.
         self.context.StartPeriodicTimer(1000. / self.fps, self.GetNextFrame)
 
     def __del__(self):
-        self.context.StopTimer(self.GetNextFrame)
-        self.UnbindEvent(self.OnPaint)
-        self.UnbindEvent(self.OnSize)
-        
+        self.Destroy()
+
     def OnSize(self, event):
         self.window_w = self.context.GetClientSize(self)[0]
         self.window_h = self.context.GetClientSize(self)[1]
@@ -65,7 +63,10 @@ class StartPanel(object):
             self.context.Refresh()
 
     def Show(self):
+        self.OnSize(None)
         self.OnPaint(None)
 
     def Destroy(self):
-        pass
+        self.context.StopTimer(self.GetNextFrame)
+        self.UnbindEvent(self.OnPaint)
+        self.UnbindEvent(self.OnSize)
