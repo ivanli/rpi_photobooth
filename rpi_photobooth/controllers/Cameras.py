@@ -147,6 +147,10 @@ class FileSystemCameraStorage(CameraStorage):
         image.save(save_path)
 
 
+import mutex
+import threading
+import copy
+
 class OpencvWebcam(object):
     """
     Driver for reading from webcam using OpenCV library
@@ -166,23 +170,31 @@ class OpencvWebcam(object):
         # Internet says this should be present but we get error when trying to execute.
         #self.capture.set(cv.CV_CAP_PROP_BUFFERSIZE, 3)
         self.camera_index = camera_index
+        self.current_frame = None
+        self.capturing = False
 
     def Start(self):
-        # Do a read to initialise the webcam
-        ret, frame = self.capture.read()
-        if not ret:
-            raise WebcamException('Error occurred while reading from webcam')
+        self.capturing = True
+        self.capture_thread = threading.Thread(target=self.CaptureThread)
+        self.capture_thread.daemon = True
+        self.capture_thread.start()
 
+    def Stop(self):
+        self.capturing = False
 
     def Read(self):
-        ret, frame = self.capture.read()
-        if not ret:
-            raise WebcamException('Error occurred while reading from webcam')
-        
-        # Do colour coversion, otherwise image will appear with funny colours.
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        return ret, frame
+        if self.current_frame is None:
+            return False, None
+
+        return True, copy.deepcopy(self.current_frame)
+
+    def CaptureThread(self):
+        while self.capturing:
+            ret, frame = self.capture.read()
+            if ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                self.current_frame = frame
+
 
 class WebcamException(Exception):
     """
