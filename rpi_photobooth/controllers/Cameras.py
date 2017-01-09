@@ -193,10 +193,15 @@ class PygameWebcam(object):
        pygame.camera.init()
        self.camera_index = camera_index
        self.frame_size = frame_size
+       self.camera_screen = pygame.surface.Surface(frame_size)
        
     def Start(self):
         self.camera = pygame.camera.Camera('/dev/video{}'.format(self.camera_index), self.frame_size)
         self.camera.start()
+
+    def Read(self):
+        self.camera.get_image(self.camera_screen)
+        return True, self.camera_screen
 
 class WebcamException(Exception):
     """

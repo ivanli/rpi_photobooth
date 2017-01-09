@@ -3,15 +3,6 @@ import logging as log
 
 import pygame
 
-# 
-# Events
-#
-
-EVT_KEY_PRESS = 0
-EVT_TIMER_EXPIRY = 1
-EVT_REFRESH = 2
-EVT_SIZE = 3
-
 #
 # View Contexts
 #
@@ -21,24 +12,26 @@ class PygameViewContext(object):
     This class provides the abstraction for hiding the actual UI implementation as much as possible.
     """
 
-    KEY_ESCAPE = 0
-    KEY_LEFT = 0
-    KEY_RIGHT = 0
-    KEY_F12 = 0
+    KEY_ESCAPE = pygame.K_ESCAPE
+    KEY_LEFT = pygame.K_LEFT
+    KEY_RIGHT = pygame.K_RIGHT
+    KEY_F12 = pygame.K_F12
+
+    EVT_KEY_PRESS = pygame.KEYDOWN
+    EVT_REFRESH = pygame.USEREVENT + 1
+    EVT_TIMER_START = pygame.USEREVENT + 2
+    EVT_TIMER_END = pygame.NUMEVENTS
 
     def __init__(self, start_resolution):
         self.resolution = start_resolution
         self.event_bindings = {}
-        self.timers = {} 
 
-        KEY_ESCAPE = pygame.K_ESCAPE
-        KEY_LEFT = pygame.K_LEFT
-        KEY_RIGHT = pygame.K_RIGHT
-        KEY_F12 = pygame.K_F12
+        for i in range(0, pygame.NUMEVENTS + 1):
+            self.event_bindings[i] = []
 
         pygame.init()
-        #self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
-        self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
+        self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
+        #self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
 
     def __del__(self):
         pygame.quit()
@@ -47,8 +40,6 @@ class PygameViewContext(object):
         return self.display_surface
 
     def BindEvent(self, event, callback):
-        if not event in self.event_bindings.keys():
-            self.event_bindings[event] = []
         self.event_bindings[event].append(callback)
 
     def UnbindEvent(self, callback):
@@ -58,28 +49,42 @@ class PygameViewContext(object):
 
     def StartPeriodicTimer(self, period, callback):
         free_id = 0
-        for i in range(pygame.USEREVENT, pygame.NUMEVENTS):
-            if not i in self.timers.keys():
+        for i in range(self.EVT_TIMER_START, self.EVT_TIMER_END + 1):
+            if len(self.event_bindings[i]) is 0:
                 free_id = i
                 break
         if free_id is 0:
-            raise ViewException('Failed to find free timer id')
+            raise ViewException('Failed to find free event id for new timer.')
+        
+        self.BindEvent(free_id, callback)
+        pygame.time.set_timer(free_id, int(period))
 
-        self.timers[free_id] = callback
+        log.debug('Started timer with period {} id {}'.format(period, free_id))
 
     def Refresh(self):
-        pass
+        pygame.event.post(pygame.event.Event(self.EVT_REFRESH))
 
     def Run(self):
         while True:
             for event in pygame.event.get():
+                log.debug('Got pygame event {}'.format(event))
                 if event.type == pygame.KEYDOWN:
 
-                    if EVT_KEY_PRESS in self.event_bindings.keys():
-                        for fn in self.event_bindings[EVT_KEY_PRESS]:
+                    if self.EVT_KEY_PRESS in self.event_bindings.keys():
+                        for fn in self.event_bindings[self.EVT_KEY_PRESS]:
                             fn(KeyEvent(event.key))
+                    
+                elif event.type >= self.EVT_TIMER_START and event.type <= self.EVT_TIMER_END:
+                    log.debug('Detected as timer event.')
+                    if event.type in self.event_bindings.keys():
+                        log.debug('Calling callback {}'.format(self.event_bindings[event.type]))
+                        self.event_bindings[event.type][0](None)
 
-
+                else:
+                    for fn in self.event_bindings[event.type]:
+                        fn(None)
+    def GetClientSize(self, view):
+        return (1440, 900)
 
 class KeyEvent(object):
 

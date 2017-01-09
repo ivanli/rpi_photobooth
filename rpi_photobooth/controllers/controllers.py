@@ -48,7 +48,7 @@ class Photobooth:
     # State / transition triggered methods
 
     def BindAnyButton(self, event):
-        self.context.BindEvent(Contexts.EVT_KEY_PRESS, self.OnAnyButton)
+        self.context.BindEvent(self.context.EVT_KEY_PRESS, self.OnAnyButton)
 
     def StartCountdown(self, event):
         log.info('Starting countdown.')
