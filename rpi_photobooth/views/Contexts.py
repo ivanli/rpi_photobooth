@@ -30,14 +30,14 @@ class PygameViewContext(object):
             self.event_bindings[i] = []
 
         pygame.init()
-        self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
-        #self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
+        #self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
+        self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
 
     def __del__(self):
         pygame.quit()
 
     def GetDisplaySurface(self):
-        return self.display_surface
+        return pygame.display.get_surface()
 
     def BindEvent(self, event, callback):
         self.event_bindings[event].append(callback)
@@ -45,7 +45,7 @@ class PygameViewContext(object):
     def UnbindEvent(self, callback):
         # Remove all occurrances of this callback
         for key, value in self.event_bindings.iteritems():
-            value = [x for x in a if x != callback]
+            value[:] = [x for x in value if x != callback]
 
     def StartPeriodicTimer(self, period, callback):
         free_id = 0
@@ -61,13 +61,19 @@ class PygameViewContext(object):
 
         log.debug('Started timer with period {} id {}'.format(period, free_id))
 
+    def StopTimer(self, callback):
+        for i in range(self.EVT_TIMER_START, self.EVT_TIMER_END + 1):
+            if callback in self.event_bindings[i]:
+                self.UnbindEvent(callback)
+                pygame.time.set_timer(i, 0)
+
     def Refresh(self):
         pygame.event.post(pygame.event.Event(self.EVT_REFRESH))
 
     def Run(self):
         while True:
             for event in pygame.event.get():
-                log.debug('Got pygame event {}'.format(event))
+                #log.debug('Got pygame event {}'.format(event))
                 if event.type == pygame.KEYDOWN:
 
                     if self.EVT_KEY_PRESS in self.event_bindings.keys():
@@ -75,8 +81,8 @@ class PygameViewContext(object):
                             fn(KeyEvent(event.key))
                     
                 elif event.type >= self.EVT_TIMER_START and event.type <= self.EVT_TIMER_END:
-                    log.debug('Detected as timer event.')
-                    if event.type in self.event_bindings.keys():
+                    log.debug('Detected as timer event {}.'.format(event.type))
+                    if event.type in self.event_bindings.keys() and len(self.event_bindings[event.type]) > 0:
                         log.debug('Calling callback {}'.format(self.event_bindings[event.type]))
                         self.event_bindings[event.type][0](None)
 
@@ -93,4 +99,9 @@ class KeyEvent(object):
 
     def GetKeyCode(self):
         return self.key_code
+
+
+class ViewException(Exception):
+    pass
+
 

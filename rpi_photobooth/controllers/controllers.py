@@ -20,14 +20,18 @@ class Photobooth:
         self.camera = camera
         self.photo_storage = photo_storage
         self.printer = printer
+        self.print_count = 1
+        self.printed_count = 0
+
+        self.context.BindEvent(self.context.EVT_KEY_PRESS, self.OnAnyButton)
 
         # Create state machine for photobooth
         s = [
             transitions.State(name='Init'),
-            transitions.State(name='Start', on_enter=['BindAnyButton', 'ClearPhotos', 'RenderStart'], on_exit=['ClearScreen']),
+            transitions.State(name='Start', on_enter=['ClearPhotos', 'RenderStart'], on_exit=['ClearScreen']),
             transitions.State(name='Countdown', on_enter=['StartCountdown', 'RenderCountdown'], on_exit=['StopCountdown', 'ClearScreen']),
             transitions.State(name='ReviewPhoto', on_enter=['RenderReviewPhoto'], on_exit=['ClearScreen']),
-            transitions.State(name='PrintPhoto', on_enter=['CreatePrint', 'RenderPrintPhoto', 'StartPrintPhoto'], on_exit=['ClearScreen']),
+            transitions.State(name='PrintPhoto', on_enter=['RenderPrintPhoto'], on_exit=['ClearScreen']),
             transitions.State(name='Exit', on_enter=['ExitApp'])
         ]
         t = [
@@ -35,10 +39,14 @@ class Photobooth:
 
             { 'trigger':'KeyDown', 'source':'Start', 'dest':'Countdown', 'conditions':'IsLeftRightKey' },
             { 'trigger':'CountExpired', 'source':'Countdown', 'dest':'ReviewPhoto', 'conditions':'IsCountdownDone', 'prepare':'DecrementCountdown', 'before':'TakePhoto' },
-            { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'PrintPhoto', 'conditions':['IsRightKey', 'HasEnoughPhotos'] },
+            { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'PrintPhoto', 'conditions':['IsRightKey', 'HasEnoughPhotos'], 'before':['CreatePrint', 'StartPrintPhoto'] },
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'Countdown', 'conditions':'IsRightKey' },
             { 'trigger':'KeyDown', 'source':'ReviewPhoto', 'dest':'Countdown', 'conditions':'IsLeftKey', 'before':'DeleteLastPhoto' },
-            { 'trigger':'Printed', 'source':'PrintPhoto', 'dest':'Start' },
+            
+            { 'trigger':'Printed', 'source':'PrintPhoto', 'dest':'PrintPhoto', 'unless':'HasPrintedEnough', 'before':'StartPrintPhoto' },
+            { 'trigger':'Printed', 'source':'PrintPhoto', 'dest':'Start', 'conditions':'HasPrintedEnough', 'before':'ResetPrintVariables' },
+            { 'trigger':'KeyDown', 'source':'PrintPhoto', 'dest':'PrintPhoto', 'conditions':'IsRightKey', 'before':'IncPrintCount' },
+            { 'trigger':'KeyDown', 'source':'PrintPhoto', 'dest':'PrintPhoto', 'conditions':'IsLeftKey', 'before':'DecPrintCount' },
         ]
         initial_s = 'Init'
         fsm = transitions.Machine(model=self, send_event=True, states=s, transitions=t, initial=initial_s)
@@ -47,14 +55,11 @@ class Photobooth:
 
     # State / transition triggered methods
 
-    def BindAnyButton(self, event):
-        self.context.BindEvent(self.context.EVT_KEY_PRESS, self.OnAnyButton)
-
     def StartCountdown(self, event):
         log.info('Starting countdown.')
 
         self.countdown = 1
-        self.countdown_timer = self.Context.StartPeriodicTimer(1000, OnCountdownTimerExpiry)
+        self.context.StartPeriodicTimer(1000, self.OnCountdownTimerExpiry)
         
         log.debug('Countdown started with initial count {}.'.format(self.countdown))
 
@@ -67,7 +72,7 @@ class Photobooth:
         log.debug('Countdown is now {}'.format(self.countdown))
 
     def StopCountdown(self, event):
-        self.context.StopTimer(self.countdown_timer)
+        self.context.StopTimer(self.OnCountdownTimerExpiry)
 
     def TakePhoto(self, event):
         self.camera.TakePhoto()
@@ -99,27 +104,46 @@ class Photobooth:
         log.info('Starting photo print.')
 
         self.print_id = self.printer.PrintImage(self.final_print)
+        self.printed_count += 1
 
         # Set a timer to check whether the job was done
-        self.print_timer = self.context.StartPeriodicTimer(500, self.OnPrintPhotoTimerExpiry)
+        self.context.StartPeriodicTimer(500, self.OnPrintPhotoTimerExpiry)
 
         log.debug('Photo printing started.')
 
     def ClearPhotos(self, event):
         self.photo_storage.Clear()
 
+    def IncPrintCount(self, event):
+        if self.print_count < 3:
+            self.print_count += 1
+            self.current_view.SetPrintCount(self.print_count)
+
+    def DecPrintCount(self, event):
+        if self.printed_count < self.print_count:
+            self.print_count -= 1
+            self.current_view.SetPrintCount(self.print_count)
+
+    def ResetPrintVariables(self, event):
+        self.print_count = 1
+        self.printed_count = 0
+
+    #
+    # Rendering methods
+    #
+
     def RenderStart(self, event):
-        self.current_view = views.StartPanel(self.context, self.webcam)
+        self.current_view = views.StartView(self.context, self.webcam)
         self.current_view.Show()
 
     def RenderCountdown(self, event):
-        self.current_view = views.CountdownPanel(self.context, self.webcam, 1)
+        self.current_view = views.CountdownView(self.context, self.webcam, 1)
         self.current_view.Show()
 
     def RenderReviewPhoto(self, event):
         log.info('Rendering review photo screen.')
 
-        self.current_view = views.ReviewPhotoPanel(self.context, self.photo_storage.GetLast())
+        self.current_view = views.ReviewPhotoView(self.context, self.photo_storage.GetLast())
         self.current_view.Show()
 
         log.debug('Render of review photo screen completed.')
@@ -127,7 +151,7 @@ class Photobooth:
     def RenderPrintPhoto(self, event):
         log.info('Rendering print photo screen.')
 
-        self.current_view = views.PrintPhotoPanel(self.context, self.final_print)
+        self.current_view = views.PrintPhotoView(self.context, self.final_print, self.print_count)
         self.current_view.Show()
 
         log.debug('Render of print photo screen completed.')
@@ -142,25 +166,28 @@ class Photobooth:
 
     def IsEscKey(self, event):
         key_code = event.kwargs.get('key_code', wx.WXK_NONE)
-        return (key_code == wx.WXK_ESCAPE)
+        return (key_code == self.context.KEY_ESCAPE)
 
     def IsLeftKey(self, event):
         key_code = event.kwargs.get('key_code', wx.WXK_NONE)
-        return (key_code == wx.WXK_LEFT)
+        return (key_code == self.context.KEY_LEFT)
 
     def IsRightKey(self, event):
         key_code = event.kwargs.get('key_code', wx.WXK_NONE)
-        return (key_code == wx.WXK_RIGHT)
+        return (key_code == self.context.KEY_RIGHT)
 
     def IsLeftRightKey(self, event):
         key_code = event.kwargs.get('key_code', wx.WXK_NONE)
-        return (key_code == wx.WXK_LEFT or key_code == wx.WXK_RIGHT)
+        return (key_code == self.context.KEY_LEFT or key_code == self.context.KEY_RIGHT)
 
     def IsCountdownDone(self, event):
         return self.countdown < 0
 
     def HasEnoughPhotos(self, event):
         return len(self.photo_storage.GetPhotos()) >= 3
+
+    def HasPrintedEnough(self, event):
+        return (self.printed_count == self.print_count)
 
 
     # wxPython event bindings
@@ -179,7 +206,7 @@ class Photobooth:
 
     def OnPrintPhotoTimerExpiry(self, event):
         if self.printer.HasFinished():
-            self.print_timer.Stop()
+            self.context.StopTimer(self.OnPrintPhotoTimerExpiry)
             self.Printed()
 
 
