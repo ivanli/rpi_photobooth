@@ -214,10 +214,15 @@ class DummyPygameWebcam(object):
 
         path = pkg_resources.resource_filename('rpi_photobooth.resources.images.webcam', 'frame1.jpg')
         image_surface = pygame.image.load(path)
-        self.images.append(pygame.transform.rotate(image_surface, 90))
+        image_surface = pygame.transform.rotate(image_surface, -90)
+        image_surface = pygame.transform.flip(image_surface, True, False)
+        self.images.append(image_surface)
+
         path = pkg_resources.resource_filename('rpi_photobooth.resources.images.webcam', 'frame2.jpg')
         image_surface = pygame.image.load(path)
-        self.images.append(pygame.transform.rotate(image_surface, 90))
+        image_surface = pygame.transform.rotate(image_surface, -90)
+        image_surface = pygame.transform.flip(image_surface, True, False)
+        self.images.append(image_surface)
 
     def Start(self):
         pass

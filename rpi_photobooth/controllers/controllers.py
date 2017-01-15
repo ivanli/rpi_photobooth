@@ -5,6 +5,7 @@ import transitions
 import pkg_resources
 
 import PIL.Image
+import numpy
 
 import cv2
 import cv
@@ -87,18 +88,54 @@ class Photobooth:
         log.debug('Template image size is {}.'.format(image.size))
 
         # Assemble print image 
+        photo_pos = [[], []]
+        photo_pos[0].append((10, 314))
+        photo_pos[0].append((10, 764))
+        photo_pos[0].append((10, 1214))
+        photo_pos[1].append((610, 314))
+        photo_pos[1].append((610, 764))
+        photo_pos[1].append((610, 1214))
+
+        photo_size = tuple(numpy.subtract((590, 749), photo_pos[0][0]))
+
         photos = self.photo_storage.GetPhotos()
-        photos[-3].thumbnail((560, 420))
-        photos[-2].thumbnail((560, 420))
-        photos[-1].thumbnail((560, 420))
-        image.paste(photos[-3], (20, 154))
-        image.paste(photos[-3], (620, 154))
-        image.paste(photos[-2], (20, 621))
-        image.paste(photos[-2], (620, 621))
-        image.paste(photos[-1], (20, 1087))
-        image.paste(photos[-1], (620, 1087))
+
+        for col in photo_pos:
+            for i in range(0, len(col)):
+                pos = col[i]
+                img = photos[i]
+                cropped_image = self.ResizeCrop(img, photo_size)
+                image.paste(cropped_image, pos)
 
         self.final_print = image
+
+    def ResizeCrop(self, image, size):
+        result_ratio = size[0] / size[1]
+        image_ratio = image.size[0] / image.size[1]
+
+        if result_ratio > image_ratio:
+            # going to a wider aspect ratio, so the image height will be cropped
+            width_ratio = size[0] / image.size[0]
+            resized_image = image.resize((size[0], int(image.size[1] * width_ratio)))
+
+            extra_height = resized_image.size[1] - size[1]
+            extra_top = int(extra_height / 2)
+            cropped_image = image.crop((0, extra_top, size[0], extra_top + size[1]))
+
+        else:
+            # going to a narrower aspect ratio, so the image width will be cropped
+            height_ratio = float(size[1]) / float(image.size[1])
+            
+            log.debug('Original image {}. Target image {}.'.format(image.size, size))
+            log.debug('Height ratio is {}'.format(height_ratio))
+            resized_image = image.resize((int(image.size[0] * height_ratio), size[1]))
+
+            extra_width = resized_image.size[0] - size[0]
+            extra_left = int(extra_width / 2)
+            cropped_image = image.crop((extra_left, 0, extra_left + size[0], size[1]))
+        
+        return cropped_image
+
 
     def StartPrintPhoto(self, event):
         log.info('Starting photo print.')
