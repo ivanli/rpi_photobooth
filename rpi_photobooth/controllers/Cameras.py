@@ -8,6 +8,7 @@ import gphoto2 as gp
 
 import cv2
 import cv
+import numpy
 
 import pygame
 import pygame.camera
@@ -204,7 +205,9 @@ class PygameWebcam(object):
 
     def Read(self):
         self.camera.get_image(self.camera_screen)
-        return True, pygame.surfarray.array3d(self.camera_screen)
+        frame = pygame.surfarray.array3d(self.camera_screen)
+        frame = numpy.rot90(frame, 3)
+        return True, frame 
 
 class DummyPygameWebcam(object):
 

@@ -59,7 +59,7 @@ class Photobooth:
     def StartCountdown(self, event):
         log.info('Starting countdown.')
 
-        self.countdown = 1
+        self.countdown = 3
         self.context.StartPeriodicTimer(1000, self.OnCountdownTimerExpiry)
         
         log.debug('Countdown started with initial count {}.'.format(self.countdown))
@@ -120,7 +120,7 @@ class Photobooth:
 
             extra_height = resized_image.size[1] - size[1]
             extra_top = int(extra_height / 2)
-            cropped_image = image.crop((0, extra_top, size[0], extra_top + size[1]))
+            cropped_image = resized_image.crop((0, extra_top, size[0], extra_top + size[1]))
 
         else:
             # going to a narrower aspect ratio, so the image width will be cropped
@@ -128,11 +128,14 @@ class Photobooth:
             
             log.debug('Original image {}. Target image {}.'.format(image.size, size))
             log.debug('Height ratio is {}'.format(height_ratio))
-            resized_image = image.resize((int(image.size[0] * height_ratio), size[1]))
+
+            new_size = (int(image.size[0] * height_ratio), size[1])
+            log.debug('Resizing to {}'.format(new_size))
+            resized_image = image.resize(new_size)
 
             extra_width = resized_image.size[0] - size[0]
             extra_left = int(extra_width / 2)
-            cropped_image = image.crop((extra_left, 0, extra_left + size[0], size[1]))
+            cropped_image = resized_image.crop((extra_left, 0, extra_left + size[0], size[1]))
         
         return cropped_image
 
@@ -174,7 +177,7 @@ class Photobooth:
         self.current_view.Show()
 
     def RenderCountdown(self, event):
-        self.current_view = views.CountdownView(self.context, self.webcam, 1)
+        self.current_view = views.CountdownView(self.context, self.webcam, 3)
         self.current_view.Show()
 
     def RenderReviewPhoto(self, event):
