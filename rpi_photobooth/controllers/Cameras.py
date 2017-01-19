@@ -110,8 +110,12 @@ class GPhotoCamera(Camera):
         self.camera.exit(self.context)
 
     def TakePhoto(self):
+        log.info('Taking photo.')
+
         self.camera.init(self.context)
         path = self.camera.capture(gp.GP_CAPTURE_IMAGE, self.context)
+        log.debug('Captured image.')
+
         camera_file = self.camera.file_get(path.folder, path.name, gp.GP_FILE_TYPE_NORMAL, self.context)
         save_path = os.path.join(self.tmp_dir, path.name)
         camera_file.save(save_path)
@@ -119,6 +123,8 @@ class GPhotoCamera(Camera):
 
         image = PIL.Image.open(save_path)
         self.storage.AddPhoto(image)
+
+        log.debug('Finished taking photo.')
 
 
 class FileSystemCameraStorage(CameraStorage):
@@ -147,7 +153,7 @@ class FileSystemCameraStorage(CameraStorage):
 
         self.images.append(image) 
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
-        save_path = os.path.join(self.directory, '{}.png'.format(timestamp)) 
+        save_path = os.path.join(self.directory, '{}.jpg'.format(timestamp)) 
 
         log.debug('Saving image to {}'.format(save_path))
 
