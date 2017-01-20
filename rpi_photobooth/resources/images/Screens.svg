@@ -64,10 +64,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="578.62956"
-     inkscape:cy="408.49482"
+     inkscape:cx="356.4867"
+     inkscape:cy="405.63768"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g4398"
      showgrid="false"
      units="px"
      inkscape:snap-page="true"
@@ -1226,7 +1226,7 @@
          x="723.77838"
          y="837.979"
          id="tspan4032-7-1"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:81.31462097px;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">All Done!</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:81.31462097px;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">Select prints</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.33375263;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 1247.9579,818.88303 c 0,0 132.4895,-29.70768 128.9979,26.7941"
@@ -1260,7 +1260,9 @@
          x="723.54156"
          y="874.05035"
          id="tspan4032-7-1-4"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';fill:#84bfb5;fill-opacity:1">photos are printing...</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';fill:#84bfb5;fill-opacity:1">How many do you want<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:serif;-inkscape-font-specification:serif"
+   id="tspan4480">?</tspan></tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:33.86441803px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1268,16 +1270,16 @@
        y="820.33478"
        id="text4028-6-8-3-0"
        sodipodi:linespacing="89.999998%"><tspan
-         sodipodi:role="line"
-         x="1163.2092"
-         y="820.33478"
-         id="tspan4032-7-1-4-3"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">Print more </tspan><tspan
          id="tspan7246"
          sodipodi:role="line"
          x="1159.6255"
+         y="820.33478"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">OK that's</tspan><tspan
+         sodipodi:role="line"
+         x="1159.6255"
          y="860.61298"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">copies</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'"
+         id="tspan4486">enough</tspan></text>
     <rect
        y="115.71429"
        x="280.00003"
@@ -1287,21 +1289,16 @@
        style="fill:#112433;fill-opacity:1;stroke:none;stroke-width:1.62858105;stroke-opacity:1" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:33.86441803px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="305.62512"
-       y="820.33478"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:56.76062393px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="317.41223"
+       y="846.20953"
        id="text4028-6-8-3-0-1"
        sodipodi:linespacing="89.999998%"><tspan
-         id="tspan7246-6"
-         sodipodi:role="line"
-         x="305.62512"
-         y="820.33478"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">Cancel next</tspan><tspan
          id="tspan7271"
          sodipodi:role="line"
-         x="305.62512"
-         y="860.61298"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">print</tspan></text>
+         x="317.41223"
+         y="846.20953"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:75.01206207px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'">More! (+1)</tspan></text>
     <rect
        y="115.71429"
        x="280.00003"
@@ -1431,6 +1428,201 @@
            x="-583.237"
            id="tspan7339-2-7"
            sodipodi:role="line">x</tspan></text>
+    </g>
+  </g>
+  <g
+     style="display:inline"
+     inkscape:label="Sent To Print Screen"
+     id="g4398"
+     inkscape:groupmode="layer">
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path4404"
+       d="m 1247.9579,818.88303 c 0,0 132.4895,-29.70768 128.9979,26.7941"
+       style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.33375263;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path4406"
+       d="m 1358.4019,838.96105 c 0,0 22.5775,-4.30048 20.4272,19.35217 -2.1502,23.65256 -10.7512,-18.27703 16.1268,-18.27703"
+       style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:2.25775123;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       sodipodi:linespacing="89.999998%"
+       id="text4416"
+       y="812.33478"
+       x="1232.5631"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:33.86441803px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:end;text-anchor:end"
+         y="812.33478"
+         x="1232.5631"
+         sodipodi:role="line"
+         id="tspan4420">Next!</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:44.75355911px;line-height:89.99999762%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:end;text-anchor:end"
+         y="852.61298"
+         x="1232.5631"
+         sodipodi:role="line"
+         id="tspan4488">Let someone else have a go.</tspan></text>
+    <rect
+       style="fill:#112433;fill-opacity:1;stroke:none;stroke-width:1.62858105;stroke-opacity:1"
+       id="rect4422"
+       width="875.71423"
+       height="659.99994"
+       x="280.00003"
+       y="115.71429" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text4400"
+       y="513.46191"
+       x="723.94214"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:129.58363342px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:171.25137329px;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club'"
+         id="tspan4402"
+         y="513.46191"
+         x="723.94214"
+         sodipodi:role="line">All Done!</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4412"
+       y="589.42944"
+       x="723.44336"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:71.31962585px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#84bfb5;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:94.25252533px;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';fill:#84bfb5;fill-opacity:1"
+         id="tspan4414"
+         y="589.42944"
+         x="723.44336"
+         sodipodi:role="line">photos are printing...</tspan></text>
+    <rect
+       clip-path="url(#clipPath7486)"
+       style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.62858105;stroke-opacity:1"
+       id="rect4430"
+       width="875.71423"
+       height="659.99994"
+       x="280.00003"
+       y="115.71429" />
+    <g
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       transform="matrix(0.68367654,0,0,0.68367654,-256.93148,59.95741)"
+       id="g4432">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         style="display:inline"
+         id="g4434"
+         transform="matrix(0.26422005,0,0,0.35849736,-423.79964,314.10837)">
+        <rect
+           style="fill:#112433;fill-opacity:1;stroke:none;stroke-width:1.62858105;stroke-opacity:1"
+           id="rect4436"
+           width="1426.1716"
+           height="1074.8634"
+           x="-1470.1505"
+           y="-347.46072" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:688.00976562px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-724.44452"
+         y="618.55389"
+         id="text4438"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4440"
+           x="-724.44452"
+           y="618.55389">1</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:330.41729736px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-583.237"
+         y="562.13373"
+         id="text4442"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4444"
+           x="-583.237"
+           y="562.13373">x</tspan></text>
+    </g>
+    <g
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       transform="matrix(0.68367654,0,0,0.68367654,-256.93148,59.95741)"
+       id="g4446">
+      <g
+         style="display:inline"
+         id="g4448"
+         transform="matrix(0.26413294,0,0,0.35849736,-423.80347,704.61668)">
+        <rect
+           style="fill:#112433;fill-opacity:1;stroke:none;stroke-width:1.62858105;stroke-opacity:1"
+           id="rect4450"
+           width="1426.1716"
+           height="1074.8634"
+           x="-1470.1505"
+           y="-347.46072" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:688.00976562px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-786.84583"
+         y="1012.9808"
+         id="text4452"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4454"
+           x="-786.84583"
+           y="1012.9808">2</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:330.41729736px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-583.237"
+         y="951.46741"
+         id="text4456"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4458"
+           x="-583.237"
+           y="951.46741">x</tspan></text>
+    </g>
+    <g
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       transform="matrix(0.68367654,0,0,0.68367654,-256.93148,59.95741)"
+       id="g4460">
+      <g
+         style="display:inline"
+         id="g4462"
+         transform="matrix(0.26413294,0,0,0.35849736,-423.80347,1094.6167)">
+        <rect
+           style="fill:#112433;fill-opacity:1;stroke:none;stroke-width:1.62858105;stroke-opacity:1"
+           id="rect4464"
+           width="1426.1716"
+           height="1074.8634"
+           x="-1470.1505"
+           y="-347.46072" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:688.00976562px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-786.84583"
+         y="1402.9807"
+         id="text4466"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4468"
+           x="-786.84583"
+           y="1402.9807">3</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:330.41729736px;line-height:125%;font-family:'Braschel Club';-inkscape-font-specification:'Braschel Club';letter-spacing:0px;word-spacing:0px;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-583.237"
+         y="1341.4674"
+         id="text4470"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4472"
+           x="-583.237"
+           y="1341.4674">x</tspan></text>
     </g>
   </g>
 </svg>

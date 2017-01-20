@@ -275,9 +275,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="-93.532006"
-     inkscape:cy="329.9838"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="91.187434"
+     inkscape:cy="238.61874"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -333,7 +333,7 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-512.3622)"
-     style="display:none">
+     style="display:inline">
     <rect
        style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="rect4222"

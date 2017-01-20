@@ -226,3 +226,24 @@ class PrintPhotoView(object):
 
         pygame.display.flip()
 
+class SentToPrintView(object):
+
+    def __init__(self, context):
+        self.context = context
+
+        background_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'SentToPrintScreen.png')
+        self.background_surface = pygame.image.load(background_path).convert_alpha()
+
+        self.context.BindEvent(self.context.EVT_REFRESH, self.OnRefresh)
+
+    def Show(self):
+        self.OnRefresh(None)
+
+    def Destroy(self):
+        self.context.UnbindEvent(self.OnRefresh)
+
+    def OnRefresh(self, event):
+        display_surface = self.context.GetDisplaySurface()
+        display_surface.blit(self.background_surface, (0, 0))
+        pygame.display.flip()
+        
