@@ -80,14 +80,9 @@ class WebcamView(object):
     def GetNextFrame(self, event):
         #log.debug('Capturing next frame.')
 
-        ret, array = self.webcam.Read()
+        ret, image = self.webcam.Read()
         if ret:
-            # TODO Check if these operations are needed for webcam. Should get a consistent way to produce images
-            # on the webcam.
-            array = numpy.rot90(array)
-            array = numpy.flipud(array)
-            surface = pygame.surfarray.make_surface(array)
-            self.webcam_surface = pygame.transform.scale(surface, (self.webcam_w, self.webcam_h))
+            self.webcam_surface = pygame.transform.scale(image.ToPygameSurface(), (self.webcam_w, self.webcam_h))
             # Force a re-paint with new frame retrieved.
             self.context.Refresh()
 

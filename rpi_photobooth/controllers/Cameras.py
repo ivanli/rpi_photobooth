@@ -16,6 +16,8 @@ import pygame.surfarray
 
 import pkg_resources
 
+from . import Images
+
 #
 # Base classes
 #
@@ -203,17 +205,15 @@ class PygameWebcam(object):
        pygame.camera.init()
        self.camera_index = camera_index
        self.frame_size = frame_size
-       self.camera_screen = pygame.surface.Surface(frame_size)
+       self.camera_surface = pygame.surface.Surface(frame_size)
        
     def Start(self):
         self.camera = pygame.camera.Camera('/dev/video{}'.format(self.camera_index), self.frame_size)
         self.camera.start()
 
     def Read(self):
-        self.camera.get_image(self.camera_screen)
-        frame = pygame.surfarray.array3d(self.camera_screen)
-        frame = numpy.rot90(frame, 3)
-        return True, frame 
+        self.camera.get_image(self.camera_surface)
+        return True, Images.PyCamImage(self.camera_surface) 
 
 class DummyPygameWebcam(object):
 
@@ -223,14 +223,10 @@ class DummyPygameWebcam(object):
 
         path = pkg_resources.resource_filename('rpi_photobooth.resources.images.webcam', 'frame1.jpg')
         image_surface = pygame.image.load(path)
-        image_surface = pygame.transform.rotate(image_surface, -90)
-        image_surface = pygame.transform.flip(image_surface, True, False)
         self.images.append(image_surface)
 
         path = pkg_resources.resource_filename('rpi_photobooth.resources.images.webcam', 'frame2.jpg')
         image_surface = pygame.image.load(path)
-        image_surface = pygame.transform.rotate(image_surface, -90)
-        image_surface = pygame.transform.flip(image_surface, True, False)
         self.images.append(image_surface)
 
     def Start(self):
@@ -238,8 +234,7 @@ class DummyPygameWebcam(object):
 
     def Read(self):
         self.image_index = (self.image_index + 1) % len(self.images)
-        frame = pygame.surfarray.array3d(self.images[self.image_index])
-        return True, frame
+        return True, Images.PyCamImage(self.images[self.image_index])
 
 
 class WebcamException(Exception):
