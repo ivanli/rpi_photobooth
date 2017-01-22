@@ -89,12 +89,11 @@ class WebcamCamera(Camera):
         Assumes the webcam is operational when this class is created.
         """
 
-        ret, frame = self.webcam.Read()
+        ret, image = self.webcam.Read()
         if not ret:
             raise RuntimeError('Could not take a photo. Webcam read failed.')
         
-        img = PIL.Image.fromarray(frame)
-        self.storage.AddPhoto(img)
+        self.storage.AddPhoto(image)
 
 class GPhotoCamera(Camera):
 
@@ -123,9 +122,7 @@ class GPhotoCamera(Camera):
         camera_file.save(save_path)
         self.camera.exit(self.context)
 
-        image = PIL.Image.open(save_path)
-        self.storage.AddPhoto(image)
-
+        self.storage.AddPhoto(FileImage(save_path))
         log.debug('Finished taking photo.')
 
 
@@ -159,7 +156,7 @@ class FileSystemCameraStorage(CameraStorage):
 
         log.debug('Saving image to {}'.format(save_path))
 
-        image.save(save_path)
+        image.Save(save_path)
 
 
 class OpencvWebcam(object):

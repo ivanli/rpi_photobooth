@@ -45,7 +45,7 @@ class CupsPrinter(PrintingService):
     def PrintImage(self, image):
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
         image_path = os.path.join(self.working_dir, 'ToPrint-{}.jpg'.format(timestamp))
-        image.save(image_path)
+        image.Save(image_path)
         self.last_print_id = self.conn.printFile(self.printer_name, image_path, "Photobooth", {})
 
     def HasFinished(self):
@@ -67,7 +67,7 @@ class FilePrinter(PrintingService):
     def PrintImage(self, image):
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
         image_path = os.path.join(self.working_dir, 'ToPrint-{}.jpg'.format(timestamp))
-        image.save(image_path)
+        image.Save(image_path)
 
         self.print_start = time.time()
 

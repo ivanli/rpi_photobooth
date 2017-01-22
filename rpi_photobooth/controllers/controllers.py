@@ -6,12 +6,15 @@ import pkg_resources
 
 import PIL.Image
 import numpy
+import pygame
 
 import cv2
 import cv
 
 from ..views import PygameViews as views
 from ..views import Contexts
+
+from . import Images
 
 class Photobooth:
 
@@ -28,6 +31,10 @@ class Photobooth:
         self.print_notif_period = 8000
         self.max_print_count = 3
 
+        # Resources
+        self.print_template_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'PrintTemplate.png')
+
+        # Bind to events of interest. We use key presses to control the photobooth for now.
         self.context.BindEvent(self.context.EVT_KEY_PRESS, self.OnAnyButton)
 
         # Create state machine for photobooth
@@ -90,10 +97,11 @@ class Photobooth:
         self.photo_storage.DeleteLast()
 
     def CreatePrint(self, event):
-        template_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'PrintTemplate.png')
-        image = PIL.Image.open(template_path)
+        # TODO Refactor the need to know which image library is in use here. Could create a NativeImage class that extends the 
+        # desired specific image class to use.
+        print_surface = pygame.image.load(self.print_template_path)
 
-        log.debug('Template image size is {}.'.format(image.size))
+        log.debug('Template image size is {}.'.format(print_surface.get_size()))
 
         # Assemble print image 
         photo_pos = [[], []]
@@ -110,43 +118,13 @@ class Photobooth:
 
         for col in photo_pos:
             for i in range(0, len(col)):
+                log.debug(i)
                 pos = col[i]
                 img = photos[i]
-                cropped_image = self.ResizeCrop(img, photo_size)
-                image.paste(cropped_image, pos)
+                img.ResizeProportional(photo_size)
+                print_surface.blit(img.ToPygameSurface(), pos)
 
-        self.final_print = image
-
-    def ResizeCrop(self, image, size):
-        result_ratio = size[0] / size[1]
-        image_ratio = image.size[0] / image.size[1]
-
-        if result_ratio > image_ratio:
-            # going to a wider aspect ratio, so the image height will be cropped
-            width_ratio = size[0] / image.size[0]
-            resized_image = image.resize((size[0], int(image.size[1] * width_ratio)))
-
-            extra_height = resized_image.size[1] - size[1]
-            extra_top = int(extra_height / 2)
-            cropped_image = resized_image.crop((0, extra_top, size[0], extra_top + size[1]))
-
-        else:
-            # going to a narrower aspect ratio, so the image width will be cropped
-            height_ratio = float(size[1]) / float(image.size[1])
-            
-            log.debug('Original image {}. Target image {}.'.format(image.size, size))
-            log.debug('Height ratio is {}'.format(height_ratio))
-
-            new_size = (int(image.size[0] * height_ratio), size[1])
-            log.debug('Resizing to {}'.format(new_size))
-            resized_image = image.resize(new_size)
-
-            extra_width = resized_image.size[0] - size[0]
-            extra_left = int(extra_width / 2)
-            cropped_image = resized_image.crop((extra_left, 0, extra_left + size[0], size[1]))
-        
-        return cropped_image
-
+        self.final_print = Images.PyCamImage(print_surface)
 
     def StartPrintPhoto(self, event):
         log.info('Starting photo print.')
