@@ -44,7 +44,7 @@ class PyCamImage(Image):
         if result_ratio > image_ratio:
             # going to a wider aspect ratio, so the image height will be cropped
             width_ratio = float(size[0]) / float(image.get_width())
-            resized_image = pygame.transform.smoothscale(image, (size[0], int(image.get_height() * width_ratio)))
+            resized_image = pygame.transform.scale(image, (size[0], int(image.get_height() * width_ratio)))
 
             log.debug('Resized image {}'.format(resized_image.get_size()))
 
@@ -60,7 +60,8 @@ class PyCamImage(Image):
             height_ratio = float(size[1]) / float(image.get_height())
             
             new_size = (int(image.get_width() * height_ratio), size[1])
-            resized_image = pygame.transform.smoothscale(image, new_size)
+            # Need to convert the surface first so it is the right bit depth.
+            resized_image = pygame.transform.scale(image, new_size)
 
             log.debug('Resized image {}'.format(resized_image.get_size()))
 
@@ -79,3 +80,20 @@ class PyCamImage(Image):
     def Save(self, path):
         pygame.image.save(self.image_surface, path)
         
+class FileImage(Image):
+
+    def __init__(self, path):
+        image_surface = pygame.image.load(path)
+        self.image = PyCamImage(image_surface)
+
+    def ToPygameSurface(self):
+        return self.image.ToPygameSurface()
+
+    def ToPilImage(self):
+        return self.image.ToPilImage()
+
+    def ResizeProportional(self, size):
+        self.image.ResizeProportional(size)
+
+    def Save(self, path):
+        self.image.Save(path)

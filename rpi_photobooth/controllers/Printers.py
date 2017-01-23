@@ -42,11 +42,11 @@ class CupsPrinter(PrintingService):
             
         cups.setUser('pi')
 
-    def PrintImage(self, image):
+    def PrintImage(self, image, copies=1):
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
         image_path = os.path.join(self.working_dir, 'ToPrint-{}.jpg'.format(timestamp))
         image.Save(image_path)
-        self.last_print_id = self.conn.printFile(self.printer_name, image_path, "Photobooth", {})
+        self.last_print_id = self.conn.printFile(self.printer_name, image_path, "Photobooth", {"copies":str(copies)})
 
     def HasFinished(self):
         return (self.last_print_id and (self.conn.getJobs().get(self.last_print_id, None) is None))

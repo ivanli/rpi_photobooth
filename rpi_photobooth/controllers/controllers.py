@@ -127,10 +127,9 @@ class Photobooth:
         self.final_print = Images.PyCamImage(print_surface)
 
     def StartPrintPhoto(self, event):
-        log.info('Starting photo print.')
+        log.info('Starting photo print with {} copies.'.format(self.print_count))
 
-        for i in range(0, self.print_count):
-            self.printer.PrintImage(self.final_print)
+        self.printer.PrintImage(self.final_print, self.print_count)
 
         log.debug('Photo printing started.')
 

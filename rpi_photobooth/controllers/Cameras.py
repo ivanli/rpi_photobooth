@@ -122,7 +122,7 @@ class GPhotoCamera(Camera):
         camera_file.save(save_path)
         self.camera.exit(self.context)
 
-        self.storage.AddPhoto(FileImage(save_path))
+        self.storage.AddPhoto(Images.FileImage(save_path))
         log.debug('Finished taking photo.')
 
 

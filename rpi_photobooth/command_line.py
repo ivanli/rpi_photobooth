@@ -17,9 +17,12 @@ def main():
     webcam = Cameras.PygameWebcam(0, (320, 240))
     #webcam = Cameras.DummyPygameWebcam()
     webcam.Start()
+
     photo_storage = Cameras.FileSystemCameraStorage('./tmp/photobooth')
-    #camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
-    camera = Cameras.WebcamCamera(webcam, photo_storage)
+
+    camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
+    #camera = Cameras.WebcamCamera(webcam, photo_storage)
+
     printer = Printers.CupsPrinter('CP910', './tmp/photobooth/printer')
     #printer = Printers.FilePrinter('./tmp/photobooth/printer', 5000)
     printer.Start()
