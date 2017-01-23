@@ -213,7 +213,7 @@ class Photobooth:
     def HasEnoughPhotos(self, event):
         return len(self.photo_storage.GetPhotos()) >= 3
 
-    # wxPython event bindings
+    # Context bindings
 
     def OnAnyButton(self, event):
         key_code = event.GetKeyCode()

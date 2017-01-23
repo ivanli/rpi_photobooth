@@ -1,7 +1,13 @@
 
 import logging as log
 
+import sys
 import pygame
+
+try:
+    import RPi.GPIO as gpio
+except ImportError:
+    log.warn('Could not import RPi.GPIO module.')
 
 #
 # View Contexts
@@ -19,8 +25,14 @@ class PygameViewContext(object):
 
     EVT_KEY_PRESS = pygame.KEYDOWN
     EVT_REFRESH = pygame.USEREVENT + 1
-    EVT_TIMER_START = pygame.USEREVENT + 2
+    EVT_BUTTON_PRESSED = pygame.USEREVENT + 2
+    EVT_TIMER_START = pygame.USEREVENT + 3
     EVT_TIMER_END = pygame.NUMEVENTS
+
+    GPIO_LEFT_LED = 3
+    GPIO_LEFT_BUTTON = 5
+    GPIO_RIGHT_LED = 7
+    GPIO_RIGHT_BUTTON = 10
 
     def __init__(self, start_resolution):
         self.resolution = start_resolution
@@ -32,6 +44,17 @@ class PygameViewContext(object):
         pygame.init()
         #self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
         self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
+
+        if 'gpio' in sys.modules:
+            # Setup RPi GPIO modules if they're supported on this system
+            gpio.setmode(gpio.BOARD)
+            gpio.setup(GPIO_LEFT_LED, gpio.OUT)
+            gpio.setup(GPIO_RIGHT_LED, gpio.OUT)
+            gpio.setup(GPIO_LEFT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
+            gpio.setup(GPIO_RIGHT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
+
+            gpio.add_event_detect(GPIO_RIGHT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
+            gpio.add_event_detect(GPIO_LEFT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
 
     def __del__(self):
         pygame.quit()
@@ -89,8 +112,12 @@ class PygameViewContext(object):
                 else:
                     for fn in self.event_bindings[event.type]:
                         fn(None)
+
     def GetClientSize(self, view):
         return (1440, 900)
+
+    def OnGpioEvent(self, channel):
+        log.debug('Got GPIO event for {}'.format(channel))
 
 class KeyEvent(object):
 
