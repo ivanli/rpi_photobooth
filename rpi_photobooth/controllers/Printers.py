@@ -25,8 +25,9 @@ class CupsPrinter(PrintingService):
     A printing service that uses the cups services in Linux for printing. 
     """
 
-    def __init__(self, printer_name, working_dir):
+    def __init__(self, printer_name, working_dir, border_percentage=0):
         self.printer_name = printer_name
+        self.border = border_percentage
         self.working_dir = working_dir
         if not os.path.exists(working_dir):
             os.makedirs(working_dir)
@@ -44,8 +45,23 @@ class CupsPrinter(PrintingService):
 
     def PrintImage(self, image, copies=1):
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f")
+
+        image_surface = image.ToPygameSurface()
+        scale_factor = 1. + float(self.border) / 100.
+        size = image.get_size()
+        size = tuple([int(scale_factor * x) for x in size])
+
+        log.debug('Creating background surface {}'.format(size))
+        background_surface = pygame.Surface(size)
+        background_surface.fill((255, 255, 255))
+
+        new_x = int(size[0] - image.get_width()) / 2
+        new_y = int(size[1] - image.get_height()) / 2
+        background_surface.blit(image_surface, (new_x, new_y))
+
+        combined_image = Images.PyCamImage(background_surface)
         image_path = os.path.join(self.working_dir, 'ToPrint-{}.jpg'.format(timestamp))
-        image.Save(image_path)
+        combined_image.Save(image_path)
         self.last_print_id = self.conn.printFile(self.printer_name, image_path, "Photobooth", {"copies":str(copies)})
 
     def HasFinished(self):

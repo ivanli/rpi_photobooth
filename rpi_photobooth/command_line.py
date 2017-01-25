@@ -23,7 +23,7 @@ def main():
     camera = Cameras.GPhotoCamera(photo_storage, './tmp/photobooth/camera')
     #camera = Cameras.WebcamCamera(webcam, photo_storage)
 
-    printer = Printers.CupsPrinter('CP910', './tmp/photobooth/printer')
+    printer = Printers.CupsPrinter('CP910', './tmp/photobooth/printer', 10)
     #printer = Printers.FilePrinter('./tmp/photobooth/printer', 5000)
     printer.Start()
 
