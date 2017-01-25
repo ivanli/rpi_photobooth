@@ -1,8 +1,13 @@
+import logging as log
 
 import cups
 import os
 import datetime
 import time
+
+import pygame
+
+from . import Images
 
 #
 # Base classes
@@ -48,15 +53,15 @@ class CupsPrinter(PrintingService):
 
         image_surface = image.ToPygameSurface()
         scale_factor = 1. + float(self.border) / 100.
-        size = image.get_size()
+        size = image_surface.get_size()
         size = tuple([int(scale_factor * x) for x in size])
 
         log.debug('Creating background surface {}'.format(size))
         background_surface = pygame.Surface(size)
         background_surface.fill((255, 255, 255))
 
-        new_x = int(size[0] - image.get_width()) / 2
-        new_y = int(size[1] - image.get_height()) / 2
+        new_x = int(size[0] - image_surface.get_width()) / 2
+        new_y = int(size[1] - image_surface.get_height()) / 2
         background_surface.blit(image_surface, (new_x, new_y))
 
         combined_image = Images.PyCamImage(background_surface)
