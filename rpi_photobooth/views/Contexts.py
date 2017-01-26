@@ -35,6 +35,8 @@ class PygameViewContext(object):
     GPIO_RIGHT_BUTTON = 10
 
     def __init__(self, start_resolution):
+        log.debug('Initialising context.')
+
         self.resolution = start_resolution
         self.event_bindings = {}
 
@@ -45,16 +47,21 @@ class PygameViewContext(object):
         #self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
         self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
 
-        if 'gpio' in sys.modules:
+        if 'RPi.GPIO' in sys.modules:
+            log.debug('Setting up GPIO.')
+
             # Setup RPi GPIO modules if they're supported on this system
             gpio.setmode(gpio.BOARD)
-            gpio.setup(GPIO_LEFT_LED, gpio.OUT)
-            gpio.setup(GPIO_RIGHT_LED, gpio.OUT)
-            gpio.setup(GPIO_LEFT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
-            gpio.setup(GPIO_RIGHT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
+            gpio.setup(self.GPIO_LEFT_LED, gpio.OUT)
+            gpio.setup(self.GPIO_RIGHT_LED, gpio.OUT)
+            gpio.setup(self.GPIO_LEFT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
+            gpio.setup(self.GPIO_RIGHT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
 
-            gpio.add_event_detect(GPIO_RIGHT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
-            gpio.add_event_detect(GPIO_LEFT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
+            gpio.output(self.GPIO_RIGHT_LED, 0)
+            gpio.output(self.GPIO_LEFT_LED, 0)
+
+            gpio.add_event_detect(self.GPIO_RIGHT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
+            gpio.add_event_detect(self.GPIO_LEFT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
 
     def __del__(self):
         pygame.quit()

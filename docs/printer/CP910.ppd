@@ -33,7 +33,12 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer:	Type42
 *cupsVersion:	1.2
-*cupsFilter:	"application/vnd.cups-raster 100 rastertogutenprint.5.2"
+*cupsSingleFile: True
+*cupsFilter2: "image/urf image/urf 10 -"
+*cupsFilter: "image/urf 10 -"
+*cupsFilter2: "image/jpeg image/jpeg 0 maxsize(33554432) -"
+*cupsFilter: "image/jpeg 0 -"
+*cupsMaxCopies: 99
 *1284DeviceID: "MFG:Canon;CMD:Raster3;MDL:CP910;CLS:PRINTER;DES:Canon CP910;VER:1.00;CID:CA_YCC_ICP;"
 *cupsLanguages: "ca cs da de el en_GB es fi fr gl hu it ja nb nl pl pt ru sk sl sv tr uk vi zh_CN zh_TW"
 
