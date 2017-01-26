@@ -10,13 +10,11 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    # 'wx' # This is currently not working because newer wxpython is still under development
-           # It's called wxpython-pheonix for some reason.
-    # 'opencv-python'
     'transitions',
     'pillow',
     'gphoto2',
-    'pycups'
+    'pycups',
+    'pygame'
 ]
 
 test_requirements = [
@@ -26,7 +24,7 @@ test_requirements = [
 
 setup(
     name='rpi_photobooth',
-    version='0.1.0',
+    version='1.0.0',
     description="Photobooth application designed to execute on a Raspberry Pi with custom hardware",
     long_description=readme + '\n\n' + history,
     author="Ivan Li",
@@ -34,9 +32,13 @@ setup(
     url='https://github.com/ivanli/rpi_photobooth',
     packages=[
         'rpi_photobooth',
+        'rpi_photobooth.controllers',
+        'rpi_photobooth.resources',
+        'rpi_photobooth.resources.images',
+        'rpi_photobooth.views'
     ],
-    package_dir={'rpi_photobooth':
-                 'rpi_photobooth'},
+    package_dir={'rpi_photobooth':'rpi_photobooth'},
+    package_data={'rpi_photobooth':['rpi_photobooth/resources/images/*.png']},
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
