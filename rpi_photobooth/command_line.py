@@ -10,7 +10,7 @@ from .views import Contexts
 def main():
     global photobooth
     # Configure logging globally
-    log.basicConfig(format='%(levelname)s: %(message)s (%(filename)s:%(lineno)d)', level=log.DEBUG)
+    log.basicConfig(format='%(levelname)s: %(message)s (%(filename)s:%(lineno)d)', level=log.WARN)
 
     # Setup peripherals
     #webcam = Cameras.OpencvWebcam(0, (320, 240))

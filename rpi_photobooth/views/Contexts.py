@@ -44,8 +44,8 @@ class PygameViewContext(object):
             self.event_bindings[i] = []
 
         pygame.init()
-        #self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
-        self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
+        self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
+        #self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
 
         if 'RPi.GPIO' in sys.modules:
             log.debug('Setting up GPIO.')
