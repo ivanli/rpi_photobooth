@@ -57,6 +57,7 @@ class CupsPrinter(PrintingService):
         size = tuple([int(scale_factor * x) for x in size])
 
         log.debug('Creating background surface {}'.format(size))
+
         background_surface = pygame.Surface(size)
         background_surface.fill((255, 255, 255))
 
@@ -67,7 +68,10 @@ class CupsPrinter(PrintingService):
         combined_image = Images.PyCamImage(background_surface)
         image_path = os.path.join(self.working_dir, 'ToPrint-{}.jpg'.format(timestamp))
         combined_image.Save(image_path)
-        self.last_print_id = self.conn.printFile(self.printer_name, image_path, "Photobooth", {"copies":str(copies)})
+
+        for i in range(0, copies):
+            self.last_print_id = self.conn.printFile(self.printer_name, image_path, "Photobooth", {})
+            log.info('Printed with job id {}'.format(self.last_print_id))
 
     def HasFinished(self):
         return (self.last_print_id and (self.conn.getJobs().get(self.last_print_id, None) is None))
