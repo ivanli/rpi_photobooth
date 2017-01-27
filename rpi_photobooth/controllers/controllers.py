@@ -27,7 +27,7 @@ class Photobooth:
         self.print_count = 1
         
         # Configuration
-        self.countdown_start = 1
+        self.countdown_start = 3
         self.print_notif_period = 8000
         self.max_print_count = 3
 

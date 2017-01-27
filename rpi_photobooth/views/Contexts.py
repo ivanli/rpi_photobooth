@@ -30,9 +30,9 @@ class PygameViewContext(object):
     EVT_TIMER_END = pygame.NUMEVENTS
 
     GPIO_LEFT_LED = 3
-    GPIO_LEFT_BUTTON = 5
-    GPIO_RIGHT_LED = 7
-    GPIO_RIGHT_BUTTON = 10
+    GPIO_LEFT_BUTTON = 8
+    GPIO_RIGHT_LED = 11
+    GPIO_RIGHT_BUTTON = 16
 
     def __init__(self, start_resolution):
         log.debug('Initialising context.')
@@ -60,8 +60,8 @@ class PygameViewContext(object):
             gpio.output(self.GPIO_RIGHT_LED, 0)
             gpio.output(self.GPIO_LEFT_LED, 0)
 
-            gpio.add_event_detect(self.GPIO_RIGHT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
-            gpio.add_event_detect(self.GPIO_LEFT_BUTTON, gpio.RISING, callback=self.OnGpioEvent)
+            gpio.add_event_detect(self.GPIO_RIGHT_BUTTON, gpio.FALLING, callback=self.OnGpioEvent, bouncetime=800)
+            gpio.add_event_detect(self.GPIO_LEFT_BUTTON, gpio.FALLING, callback=self.OnGpioEvent, bouncetime=800)
 
     def __del__(self):
         pygame.quit()
@@ -98,7 +98,8 @@ class PygameViewContext(object):
                 pygame.time.set_timer(i, 0)
 
     def Refresh(self):
-        pygame.event.post(pygame.event.Event(self.EVT_REFRESH))
+        if not pygame.event.peek(self.EVT_REFRESH):
+            pygame.event.post(pygame.event.Event(self.EVT_REFRESH))
 
     def Run(self):
         while True:
@@ -124,7 +125,12 @@ class PygameViewContext(object):
         return (1440, 900)
 
     def OnGpioEvent(self, channel):
-        log.debug('Got GPIO event for {}'.format(channel))
+        log.info('Got GPIO event for {}'.format(channel))
+        if channel == self.GPIO_LEFT_BUTTON:
+            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {'key':self.KEY_LEFT}))
+        elif channel == self.GPIO_RIGHT_BUTTON:
+            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {'key':self.KEY_RIGHT}))
+
 
 class KeyEvent(object):
 
