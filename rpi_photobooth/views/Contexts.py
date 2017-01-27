@@ -4,11 +4,6 @@ import logging as log
 import sys
 import pygame
 
-try:
-    import RPi.GPIO as gpio
-except ImportError:
-    log.warn('Could not import RPi.GPIO module.')
-
 #
 # View Contexts
 #
@@ -29,11 +24,6 @@ class PygameViewContext(object):
     EVT_TIMER_START = pygame.USEREVENT + 3
     EVT_TIMER_END = pygame.NUMEVENTS
 
-    GPIO_LEFT_LED = 3
-    GPIO_LEFT_BUTTON = 8
-    GPIO_RIGHT_LED = 11
-    GPIO_RIGHT_BUTTON = 16
-
     def __init__(self, start_resolution):
         log.debug('Initialising context.')
 
@@ -46,22 +36,6 @@ class PygameViewContext(object):
         pygame.init()
         self.display_surface = pygame.display.set_mode(self.resolution, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
         #self.display_surface = pygame.display.set_mode(self.resolution, pygame.DOUBLEBUF | pygame.HWSURFACE)
-
-        if 'RPi.GPIO' in sys.modules:
-            log.debug('Setting up GPIO.')
-
-            # Setup RPi GPIO modules if they're supported on this system
-            gpio.setmode(gpio.BOARD)
-            gpio.setup(self.GPIO_LEFT_LED, gpio.OUT)
-            gpio.setup(self.GPIO_RIGHT_LED, gpio.OUT)
-            gpio.setup(self.GPIO_LEFT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
-            gpio.setup(self.GPIO_RIGHT_BUTTON, gpio.IN, pull_up_down = gpio.PUD_UP)
-
-            gpio.output(self.GPIO_RIGHT_LED, 0)
-            gpio.output(self.GPIO_LEFT_LED, 0)
-
-            gpio.add_event_detect(self.GPIO_RIGHT_BUTTON, gpio.FALLING, callback=self.OnGpioEvent, bouncetime=800)
-            gpio.add_event_detect(self.GPIO_LEFT_BUTTON, gpio.FALLING, callback=self.OnGpioEvent, bouncetime=800)
 
     def __del__(self):
         pygame.quit()
@@ -122,14 +96,6 @@ class PygameViewContext(object):
 
     def GetClientSize(self, view):
         return (1440, 900)
-
-    def OnGpioEvent(self, channel):
-        log.info('Got GPIO event for {}'.format(channel))
-        if channel == self.GPIO_LEFT_BUTTON:
-            pygame.event.post(pygame.event.Event(self.EVT_BUTTON_PRESSED, {'key':self.KEY_LEFT}))
-        elif channel == self.GPIO_RIGHT_BUTTON:
-            pygame.event.post(pygame.event.Event(self.EVT_BUTTON_PRESSED, {'key':self.KEY_RIGHT}))
-
 
 class KeyEvent(object):
 

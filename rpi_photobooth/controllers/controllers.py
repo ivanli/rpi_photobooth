@@ -16,7 +16,14 @@ from ..views import Contexts
 
 from . import Images
 
+from . import ButtonController
+
 class Photobooth:
+
+    GPIO_LEFT_LED = 3
+    GPIO_LEFT_BUTTON = 8
+    GPIO_RIGHT_LED = 11
+    GPIO_RIGHT_BUTTON = 16
 
     def __init__(self, view_context, webcam, camera, photo_storage, printer):
         self.context = view_context
@@ -36,6 +43,13 @@ class Photobooth:
 
         # Bind to events of interest. We use key presses to control the photobooth for now.
         self.context.BindEvent(self.context.EVT_KEY_PRESS, self.OnAnyButton)
+
+        # Setup buttons
+        self.gpio_context = ButtonController.GpioContext()
+        self.left_button = Buttons.IlluminatedButton(self.gpio_context, GPIO_LEFT_BUTTON, GPIO_LEFT_LED)
+        self.right_button = Buttons.IlluminatedButton(self.gpio_context, GPIO_RIGHT_BUTTON, GPIO_RIGHT_LED)
+        self.left_button.RegisterListener(self.OnButtonPress)
+        self.right_button.RegisterListener(self.OnButtonPress)
 
         # Create state machine for photobooth
         s = [
@@ -156,6 +170,7 @@ class Photobooth:
     def RenderStart(self, event):
         self.current_view = views.StartView(self.context, self.webcam)
         self.current_view.Show()
+        self.button_control = ButtonController.AlternateButtonCtrl(self.button_context, 600, self.left_button, self.right_button)
 
     def RenderCountdown(self, event):
         self.current_view = views.CountdownView(self.context, self.webcam, self.countdown_start)
@@ -185,6 +200,7 @@ class Photobooth:
 
     def ClearScreen(self, event):
         self.current_view.Destroy()
+        self.button_control.Stop()
         
     def ExitApp(self, event):
         sys.exit()
@@ -229,3 +245,11 @@ class Photobooth:
 
     def OnPrintNotifExpiry(self, event):
         self.PrintPeriodExpired()
+
+    # GPIO bindings
+
+    def OnButtonPress(self, channel):
+        if channel is self.GPIO_LEFT_BUTTON:
+            self.KeyDown(key_code=self.context.KEY_LEFT)
+        elif channel is self.GPIO_RIGHT_BUTTON:
+            self.KeyDown(key_code=self.context.KEY_RIGHT)
