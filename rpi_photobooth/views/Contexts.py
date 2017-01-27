@@ -104,22 +104,21 @@ class PygameViewContext(object):
     def Run(self):
         while True:
             for event in pygame.event.get():
-                #log.debug('Got pygame event {}'.format(event))
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN or event.type == self.EVT_BUTTON_PRESSED:
 
                     if self.EVT_KEY_PRESS in self.event_bindings.keys():
                         for fn in self.event_bindings[self.EVT_KEY_PRESS]:
                             fn(KeyEvent(event.key))
                     
                 elif event.type >= self.EVT_TIMER_START and event.type <= self.EVT_TIMER_END:
-                    log.debug('Detected as timer event {}.'.format(event.type))
                     if event.type in self.event_bindings.keys() and len(self.event_bindings[event.type]) > 0:
-                        log.debug('Calling callback {}'.format(self.event_bindings[event.type]))
                         self.event_bindings[event.type][0](None)
 
                 else:
                     for fn in self.event_bindings[event.type]:
                         fn(None)
+            
+            pygame.time.wait(20)
 
     def GetClientSize(self, view):
         return (1440, 900)
@@ -127,9 +126,9 @@ class PygameViewContext(object):
     def OnGpioEvent(self, channel):
         log.info('Got GPIO event for {}'.format(channel))
         if channel == self.GPIO_LEFT_BUTTON:
-            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {'key':self.KEY_LEFT}))
+            pygame.event.post(pygame.event.Event(self.EVT_BUTTON_PRESSED, {'key':self.KEY_LEFT}))
         elif channel == self.GPIO_RIGHT_BUTTON:
-            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {'key':self.KEY_RIGHT}))
+            pygame.event.post(pygame.event.Event(self.EVT_BUTTON_PRESSED, {'key':self.KEY_RIGHT}))
 
 
 class KeyEvent(object):
