@@ -1,5 +1,6 @@
 import logging as log
 import sys
+import datetime
 import wx
 import transitions
 import pkg_resources
@@ -38,6 +39,7 @@ class Photobooth:
         self.countdown_start = 3
         self.print_notif_period = 8000
         self.max_print_count = 3
+        self.input_lockout_ms = 1200
 
         # Resources
         self.print_template_path = pkg_resources.resource_filename('rpi_photobooth.resources.images', 'PrintTemplate.png')
@@ -51,6 +53,9 @@ class Photobooth:
         self.right_button = Buttons.IlluminatedButton(self.gpio_context, self.GPIO_RIGHT_BUTTON, self.GPIO_RIGHT_LED)
         self.left_button.RegisterListener(self.OnButtonPress)
         self.right_button.RegisterListener(self.OnButtonPress)
+
+        # Very stupid hackaround for buttons 
+        self.input_lockout = datetime.datetime.now() + datetime.timedelta(milliseconds=self.input_lockout_ms)
 
         # Create state machine for photobooth
         s = [
@@ -90,7 +95,7 @@ class Photobooth:
         log.info('Starting countdown.')
 
         self.countdown = self.countdown_start
-        self.context.StartPeriodicTimer(1000, self.OnCountdownTimerExpiry)
+        self.context.StartPeriodicTimer(1200, self.OnCountdownTimerExpiry)
         
         log.debug('Countdown started with initial count {}.'.format(self.countdown))
 
@@ -99,6 +104,15 @@ class Photobooth:
         self.countdown -= 1
         if self.countdown >= 0:
             self.current_view.SetCount(self.countdown)
+
+        self.button_control.Stop()
+        if self.countdown is 2:
+            self.button_control = ButtonController.FlashButtonCtrl(self.context, 200, self.left_button, self.right_button)
+        if self.countdown is 1:
+            self.button_control = ButtonController.FlashButtonCtrl(self.context, 100, self.left_button, self.right_button)
+        if self.countdown is 0:
+            self.button_control = ButtonController.FlashButtonCtrl(self.context, 50, self.left_button, self.right_button)
+        self.button_control.Start()
 
         log.debug('Countdown is now {}'.format(self.countdown))
 
@@ -177,12 +191,16 @@ class Photobooth:
     def RenderCountdown(self, event):
         self.current_view = views.CountdownView(self.context, self.webcam, self.countdown_start)
         self.current_view.Show()
+        self.button_control = ButtonController.FlashButtonCtrl(self.context, 333, self.left_button, self.right_button)
+        self.button_control.Start()
 
     def RenderReviewPhoto(self, event):
         log.info('Rendering review photo screen.')
 
         self.current_view = views.ReviewPhotoView(self.context, self.photo_storage.GetLast())
         self.current_view.Show()
+        self.button_control = ButtonController.AlternateButtonCtrl(self.context, 600, self.left_button, self.right_button)
+        self.button_control.Start()
 
         log.debug('Render of review photo screen completed.')
 
@@ -191,6 +209,8 @@ class Photobooth:
 
         self.current_view = views.PrintPhotoView(self.context, self.final_print, self.print_count)
         self.current_view.Show()
+        self.button_control = ButtonController.AlternateButtonCtrl(self.context, 600, self.left_button, self.right_button)
+        self.button_control.Start()
 
         log.debug('Render of print photo screen completed.')
 
@@ -199,10 +219,13 @@ class Photobooth:
 
         self.current_view = views.SentToPrintView(self.context)
         self.current_view.Show()
+        self.button_control = ButtonController.FlashButtonCtrl(self.context, 600, self.right_button)
+        self.button_control.Start()
 
     def ClearScreen(self, event):
         self.current_view.Destroy()
         self.button_control.Stop()
+        self.input_lockout = datetime.datetime.now() + datetime.timedelta(milliseconds=self.input_lockout_ms)
         
     def ExitApp(self, event):
         sys.exit()
@@ -246,12 +269,15 @@ class Photobooth:
         self.CountExpired()
 
     def OnPrintNotifExpiry(self, event):
+        log.info('Print notification period expired')
         self.PrintPeriodExpired()
 
     # GPIO bindings
 
     def OnButtonPress(self, channel):
-        if channel is self.GPIO_LEFT_BUTTON:
-            self.KeyDown(key_code=self.context.KEY_LEFT)
-        elif channel is self.GPIO_RIGHT_BUTTON:
-            self.KeyDown(key_code=self.context.KEY_RIGHT)
+        log.info('Got button press {}'.format(channel))
+        if datetime.datetime.now() > self.input_lockout:
+            if channel is self.GPIO_LEFT_BUTTON:
+                self.KeyDown(key_code=self.context.KEY_LEFT)
+            elif channel is self.GPIO_RIGHT_BUTTON:
+                self.KeyDown(key_code=self.context.KEY_RIGHT)

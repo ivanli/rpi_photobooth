@@ -53,6 +53,36 @@ class AlternateButtonCtrl(ButtonCtrl):
             self.right_button.SetLed(Buttons.STATE_OFF)
             self.state = self.__STATE_LEFT
 
+class FlashButtonCtrl(ButtonCtrl):
+
+    __STATE_ON = 0
+    __STATE_OFF = 1
+
+    def __init__(self, context, flash_rate_ms, *buttons):
+        self.flash_rate_ms = flash_rate_ms
+        self.context = context
+        self.buttons = buttons
+
+        self.state = self.__STATE_ON
+        for button in self.buttons:
+            button.SetLed(Buttons.STATE_OFF)
+            
+    def Start(self):
+        self.context.StartPeriodicTimer(self.flash_rate_ms, self.__OnFlashExpiry)
+
+    def Stop(self):
+        self.context.StopTimer(self.__OnFlashExpiry)
+        super(FlashButtonCtrl, self).Stop()
+
+    def __OnFlashExpiry(self, event):
+        if self.state is self.__STATE_ON:
+            for button in self.buttons:
+                button.SetLed(Buttons.STATE_OFF)
+            self.state = self.__STATE_OFF
+        elif self.state is self.__STATE_OFF:
+            for button in self.buttons:
+                button.SetLed(Buttons.STATE_ON)
+            self.state = self.__STATE_ON
 
 
 
