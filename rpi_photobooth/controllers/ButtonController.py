@@ -33,22 +33,24 @@ class AlternateButtonCtrl(ButtonCtrl):
         self.state = self.__STATE_LEFT
         left_button.SetLed(Buttons.STATE_ON)
         right_button.SetLed(Buttons.STATE_OFF)
+
+        self.buttons = [left_button, right_button]
         
     def Start(self):
         self.context.StartPeriodicTimer(self.flash_rate_ms, self.__OnFlashExpiry)
 
     def Stop(self):
         self.context.StopTimer(self.__OnFlashExpiry)
-        super(AlternateFlashButtonController, self).Stop()
+        super(AlternateButtonCtrl, self).Stop()
 
     def __OnFlashExpiry(self, event):
         if self.state is self.__STATE_LEFT:
-            left_button.SetLed(Buttons.STATE_OFF)
-            right_button.SetLed(Buttons.STATE_ON)
+            self.left_button.SetLed(Buttons.STATE_OFF)
+            self.right_button.SetLed(Buttons.STATE_ON)
             self.state = self.__STATE_RIGHT
         elif self.state is self.__STATE_RIGHT:
-            left_button.SetLed(Buttons.STATE_ON)
-            right_button.SetLed(Buttons.STATE_OFF)
+            self.left_button.SetLed(Buttons.STATE_ON)
+            self.right_button.SetLed(Buttons.STATE_OFF)
             self.state = self.__STATE_LEFT
 
 

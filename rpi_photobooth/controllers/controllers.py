@@ -13,6 +13,7 @@ import cv
 
 from ..views import PygameViews as views
 from ..views import Contexts
+from ..views import Buttons
 
 from . import Images
 
@@ -46,8 +47,8 @@ class Photobooth:
 
         # Setup buttons
         self.gpio_context = ButtonController.GpioContext()
-        self.left_button = Buttons.IlluminatedButton(self.gpio_context, GPIO_LEFT_BUTTON, GPIO_LEFT_LED)
-        self.right_button = Buttons.IlluminatedButton(self.gpio_context, GPIO_RIGHT_BUTTON, GPIO_RIGHT_LED)
+        self.left_button = Buttons.IlluminatedButton(self.gpio_context, self.GPIO_LEFT_BUTTON, self.GPIO_LEFT_LED)
+        self.right_button = Buttons.IlluminatedButton(self.gpio_context, self.GPIO_RIGHT_BUTTON, self.GPIO_RIGHT_LED)
         self.left_button.RegisterListener(self.OnButtonPress)
         self.right_button.RegisterListener(self.OnButtonPress)
 
@@ -170,7 +171,8 @@ class Photobooth:
     def RenderStart(self, event):
         self.current_view = views.StartView(self.context, self.webcam)
         self.current_view.Show()
-        self.button_control = ButtonController.AlternateButtonCtrl(self.button_context, 600, self.left_button, self.right_button)
+        self.button_control = ButtonController.AlternateButtonCtrl(self.context, 600, self.left_button, self.right_button)
+        self.button_control.Start()
 
     def RenderCountdown(self, event):
         self.current_view = views.CountdownView(self.context, self.webcam, self.countdown_start)

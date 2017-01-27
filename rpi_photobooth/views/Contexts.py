@@ -63,7 +63,7 @@ class PygameViewContext(object):
         self.BindEvent(free_id, callback)
         pygame.time.set_timer(free_id, int(period))
 
-        log.debug('Started timer with period {} id {}'.format(period, free_id))
+        log.info('Started timer with period {} id {} callback {}'.format(period, free_id, callback))
 
     def StopTimer(self, callback):
         for i in range(self.EVT_TIMER_START, self.EVT_TIMER_END + 1):
